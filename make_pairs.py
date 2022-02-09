@@ -1,3 +1,9 @@
+"""Randomize student lab groups while minimizing repeats.
+
+First, create a JSON file with an array of student names. Then, run this script
+with the cohort name as the first argument, and the names of any absent
+students as subsequent arguments."""
+
 from functools import cached_property
 from json import load as js_load
 from pickle import load as pk_load
@@ -41,7 +47,7 @@ class Cohort:
 
         with open(f'{cohort_name}.bin', 'rb') as f:
             cohort.previous_groups = pk_load(f)
-        
+
         return cohort
 
     def to_file(self) -> None:
@@ -109,7 +115,9 @@ def print_sorted(groups: list) -> None:
     """Print list of groups in a readable way."""
 
     for i in range(len(groups)):
+        # sort partners alphabetically
         groups[i] = sorted(list(groups[i]))
+    # sort groups alphabetically by first partner
     groups.sort()
 
     for group in groups:
