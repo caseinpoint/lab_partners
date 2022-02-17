@@ -40,3 +40,16 @@ class Cohort:
             other_names = [n for n in names_list if n != name]
 
             self.roster[name].update(other_names)
+
+    def get_least_pairs(self):
+        least = float('inf')
+        result = None
+
+        for student, counts in self.roster.items():
+            total = sum(counts.values())
+
+            if total < least:
+                least = total
+                result = student
+
+        return result
