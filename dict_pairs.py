@@ -2,7 +2,6 @@ from collections import Counter, OrderedDict
 from json import load as js_load
 from pickle import load as pk_load
 from pickle import dump as pk_dump
-# from random import choice
 # from sys import argv
 # from os.path import exists
 
@@ -41,11 +40,14 @@ class Cohort:
 
             self.roster[name].update(other_names)
 
-    def get_least_pairs(self):
+    def get_least_pairs(self, unavailable=set()):
         least = float('inf')
         result = None
 
         for student, counts in self.roster.items():
+            if student in unavailable:
+                continue
+
             total = sum(counts.values())
 
             if total < least:
@@ -53,3 +55,44 @@ class Cohort:
                 result = student
 
         return result
+
+    def find_partners(self, first_student, unavailable=set(), size=2):
+        partners = [first_student]
+
+        for student, _ in reversed(self.roster[first_student].most_common()):
+            if student in unavailable:
+                continue
+
+            partners.append(student)
+
+            if len(partners) == size:
+                break
+
+        return partners
+
+    def make_groups(self, unavailable=set()):
+        groups = []
+
+        all_students = list(self.roster.keys())
+
+        num_present = len(all_students) - len(unavailable)
+
+        if num_present % 2 == 1:
+            first_student = self.get_least_pairs(unavailable)
+            first_group = self.find_partners(first_student, unavailable, 3)
+
+            groups.append(first_group)
+            unavailable.update(first_group)
+            self.update_roster(first_group)
+
+        for student in all_students:
+            if student in unavailable:
+                continue
+
+            group = self.find_partners(student, unavailable)
+
+            groups.append(group)
+            unavailable.update(group)
+            self.update_roster(group)
+
+        return groups
