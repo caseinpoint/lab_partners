@@ -2,7 +2,7 @@ from collections import Counter, OrderedDict
 from json import load as js_load
 from pickle import load as pk_load
 from pickle import dump as pk_dump
-# from random import sample
+# from random import choice
 # from sys import argv
 # from os.path import exists
 
@@ -34,3 +34,9 @@ class Cohort:
             roster = pk_load(f)
 
         return cls(name, roster)
+
+    def update_roster(self, names_list):
+        for name in names_list:
+            other_names = [n for n in names_list if n != name]
+
+            self.roster[name].update(other_names)
