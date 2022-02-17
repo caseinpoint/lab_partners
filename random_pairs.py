@@ -28,8 +28,8 @@ class Cohort:
         num = len(self.roster)
 
         # odd rosters have higer max due to 3-groups
-        if num % 2 == 1:
-            num += 1
+        # if num % 2 == 1:
+        #     num += 1
 
         # maximum number of unique pairs formula: n(n-1)/2
         return num * (num - 1) // 2
