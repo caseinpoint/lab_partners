@@ -1,4 +1,4 @@
-from collections import Counter, OrderedDict
+from collections import Counter
 from json import load as js_load
 from pickle import load as pk_load
 from pickle import dump as pk_dump
@@ -42,22 +42,22 @@ class Cohort:
             self.roster[student].update(other_students)
 
     def prevent_pairing(self, students):
-        pass
+        self.roster[students[0]].update({students[1]: 10})
+        self.roster[students[1]].update({students[0]: 10})
 
     def get_least_pairs(self, unavailable=set()):
-        least = float('inf')
+        lowest_sum = float('inf')
         result = None
 
         items = list(self.roster.items())
-        shuffle(items)
         for student, counts in items:
             if student in unavailable:
                 continue
 
-            total = sum(counts.values())
+            current_sum = sum(counts.values())
 
-            if total < least:
-                least = total
+            if current_sum < lowest_sum:
+                lowest_sum = current_sum
                 result = student
 
         return result
@@ -73,46 +73,55 @@ class Cohort:
 
         return result
 
-    def find_partners(self, first_student, unavailable=set(), size=2):
-        partners = [first_student]
+    def find_pair(self, first_student, unavailable=set()):
+        # TODO: change this to just pair and create add_partner method
+        pair = [first_student]
+        students = self._shuffle_common(first_student)
 
-        while len(partners) < size:
-            students = self._shuffle_common(partners[-1])
+        for student in students:
+            if student in unavailable:
+                continue
 
-            for student in students:
-                if student in unavailable:
-                    continue
+            pair.append(student)
+            return pair
 
-                partners.append(student)
-                unavailable.update(partners)
-                break
+    def add_partner(self, group, unavailable=set()):
+        counts_sum = Counter()
 
-        return partners
+        for student in group:
+            counts_sum.update(self.roster[student])
 
-    def make_groups(self, unavailable=set()):
+        for student, _ in reversed(counts_sum.most_common()):
+            if student in unavailable or student in group:
+                continue
+
+            group.append(student)
+            return group
+
+    def generate_pairs(self, unavailable=set()):
         groups = []
 
         all_students = list(self.roster.keys())
-        # all_students.sort()
-        # shuffle(all_students)
+        all_students.sort()
 
         num_present = len(all_students) - len(unavailable)
 
         if num_present % 2 == 1:
             first_student = self.get_least_pairs(unavailable)
-            first_group = self.find_partners(first_student, unavailable, 3)
+            first_pair = self.find_pair(first_student, unavailable)
+            first_group = self.add_partner(first_pair, unavailable)
             groups.append(first_group)
-            # unavailable.update(first_group)
+            unavailable.update(first_group)
             self._update_roster(first_group)
 
         for student in all_students:
             if student in unavailable:
                 continue
 
-            group = self.find_partners(student, unavailable)
-            groups.append(group)
-            # unavailable.update(group)
-            self._update_roster(group)
+            pair = self.find_pair(student, unavailable)
+            groups.append(pair)
+            unavailable.update(pair)
+            self._update_roster(pair)
 
         return groups
 
@@ -125,3 +134,6 @@ def print_sorted(groups):
     for group in groups:
         # print(' & '.join(group))
         print(','.join(group))
+
+
+# TODO: create main function and if __name__ == '__main__'
