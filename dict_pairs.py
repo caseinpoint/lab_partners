@@ -86,12 +86,12 @@ class Cohort:
             return pair
 
     def add_partner(self, group, unavailable=set()):
-        counts_sum = Counter()
+        sum_counts = Counter()
 
         for student in group:
-            counts_sum.update(self.roster[student])
+            sum_counts.update(self.roster[student])
 
-        for student, _ in reversed(counts_sum.most_common()):
+        for student, _ in reversed(sum_counts.most_common()):
             if student in unavailable or student in group:
                 continue
 
@@ -132,8 +132,12 @@ def print_sorted(groups):
     groups.sort()
 
     for group in groups:
-        # print(' & '.join(group))
-        print(','.join(group))
+        # print(','.join(group))
+        print(' & '.join(group))
 
 
 # TODO: create main function and if __name__ == '__main__'
+# TODO: test with absent students, and prevent_pairing()
+# TODO: add doc strings and comments
+# TODO: create README
+# TODO: create remote and push
