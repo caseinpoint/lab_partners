@@ -2,6 +2,7 @@ from collections import Counter, OrderedDict
 from json import load as js_load
 from pickle import load as pk_load
 from pickle import dump as pk_dump
+from random import shuffle
 # from sys import argv
 # from os.path import exists
 
@@ -34,17 +35,22 @@ class Cohort:
 
         return cls(name, roster)
 
-    def update_roster(self, names_list):
-        for name in names_list:
-            other_names = [n for n in names_list if n != name]
+    def _update_roster(self, students):
+        for student in students:
+            other_students = [s for s in students if s != student]
 
-            self.roster[name].update(other_names)
+            self.roster[student].update(other_students)
+
+    def prevent_pairing(self, students):
+        pass
 
     def get_least_pairs(self, unavailable=set()):
         least = float('inf')
         result = None
 
-        for student, counts in self.roster.items():
+        items = list(self.roster.items())
+        shuffle(items)
+        for student, counts in items:
             if student in unavailable:
                 continue
 
@@ -56,16 +62,29 @@ class Cohort:
 
         return result
 
+    def _shuffle_common(self, student):
+        result = []
+        common = self.roster[student].most_common()
+
+        for n in range(common[-1][-1], common[0][-1] + 1):
+            sub = [s for s, c in common if c == n]
+            shuffle(sub)
+            result.extend(sub)
+
+        return result
+
     def find_partners(self, first_student, unavailable=set(), size=2):
         partners = [first_student]
 
-        for student, _ in reversed(self.roster[first_student].most_common()):
-            if student in unavailable:
-                continue
+        while len(partners) < size:
+            students = self._shuffle_common(partners[-1])
 
-            partners.append(student)
+            for student in students:
+                if student in unavailable:
+                    continue
 
-            if len(partners) == size:
+                partners.append(student)
+                unavailable.update(partners)
                 break
 
         return partners
@@ -74,25 +93,35 @@ class Cohort:
         groups = []
 
         all_students = list(self.roster.keys())
+        # all_students.sort()
+        # shuffle(all_students)
 
         num_present = len(all_students) - len(unavailable)
 
         if num_present % 2 == 1:
             first_student = self.get_least_pairs(unavailable)
             first_group = self.find_partners(first_student, unavailable, 3)
-
             groups.append(first_group)
-            unavailable.update(first_group)
-            self.update_roster(first_group)
+            # unavailable.update(first_group)
+            self._update_roster(first_group)
 
         for student in all_students:
             if student in unavailable:
                 continue
 
             group = self.find_partners(student, unavailable)
-
             groups.append(group)
-            unavailable.update(group)
-            self.update_roster(group)
+            # unavailable.update(group)
+            self._update_roster(group)
 
         return groups
+
+
+def print_sorted(groups):
+    for group in groups:
+        group.sort()
+    groups.sort()
+
+    for group in groups:
+        # print(' & '.join(group))
+        print(','.join(group))
