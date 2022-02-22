@@ -136,7 +136,20 @@ def print_sorted(groups):
 
 def help():
     message = \
-    """help message goes here"""
+        """~~~ Student Lab Partner Script ~~~
+
+An array of student names saved as "[cohort_name].json" in this directory is
+required. Replace any spaces with underscores.
+
+To generate new pairs run:
+$ python3 pairs -g [cohort_name] [space-separated list of absent students]
+
+To reduce the probability of two students being paired in the future run:
+$ python3 pairs -p [cohort_name] [student_1] [student_2]
+
+To see all students and their counts run:
+$ python3 pairs -c [cohort_name]
+"""
 
     print(message)
 
@@ -157,7 +170,7 @@ def main(flag, cohort_name=None, *names):
 
     elif flag == '-p':
         cohort.prevent_pairing(*names)
-        print(f'Updated: {names}')
+        print(f'Increased counts by {len(cohort.roster)}: {names}')
 
     elif flag == '-c':
         for student, counts in sorted(cohort.roster.items()):
