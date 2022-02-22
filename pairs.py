@@ -48,7 +48,7 @@ class Cohort:
         lowest_sum = float('inf')
         result = None
 
-        names_counts = list(self.roster.items())
+        names_counts = sorted(self.roster.items())
         for student, counts in names_counts:
             if student in unavailable:
                 continue
@@ -61,20 +61,21 @@ class Cohort:
 
         return result
 
-    def _shuffle_common(self, student):
+    @staticmethod
+    def _shuffle_common(tuples_list):
         result = []
-        common = self.roster[student].most_common()
 
-        for n in range(common[-1][-1], common[0][-1] + 1):
-            sub = [s for s, c in common if c == n]
-            shuffle(sub)
-            result.extend(sub)
+        for n in range(tuples_list[-1][-1], tuples_list[0][-1] + 1):
+            sub_group = [s for s, c in tuples_list if c == n]
+            shuffle(sub_group)
+            result.extend(sub_group)
 
         return result
 
     def find_pair(self, first_student, unavailable=set()):
         pair = [first_student]
-        students = self._shuffle_common(first_student)
+        students = Cohort._shuffle_common(
+            self.roster[first_student].most_common())
 
         for student in students:
             if student in unavailable:
@@ -89,7 +90,8 @@ class Cohort:
         for student in group:
             sum_counts.update(self.roster[student])
 
-        for student, _ in reversed(sum_counts.most_common()):
+        students = Cohort._shuffle_common(sum_counts.most_common())
+        for student in students:
             if student in unavailable or student in group:
                 continue
 
@@ -99,8 +101,7 @@ class Cohort:
     def generate_pairs(self, unavailable=set()):
         groups = []
 
-        all_students = list(self.roster.keys())
-        all_students.sort()
+        all_students = sorted(self.roster.keys())
 
         num_present = len(all_students) - len(unavailable)
 
@@ -109,6 +110,7 @@ class Cohort:
             first_pair = self.find_pair(first_student, unavailable)
             first_group = self.add_partner(first_pair, unavailable)
             groups.append(first_group)
+
             unavailable.update(first_group)
             self._update_roster(first_group)
 
@@ -118,6 +120,7 @@ class Cohort:
 
             pair = self.find_pair(student, unavailable)
             groups.append(pair)
+
             unavailable.update(pair)
             self._update_roster(pair)
 
@@ -135,8 +138,7 @@ def print_sorted(groups):
 
 
 def help():
-    message = \
-        """~~~ Student Lab Partner Script ~~~
+    message = """~~~ Student Lab Partner Script ~~~
 
 An array of student names saved as "[cohort_name].json" in this directory is
 required. Replace any spaces with underscores.
@@ -148,8 +150,7 @@ To reduce the probability of two students being paired in the future run:
 $ python3 pairs -p [cohort_name] [student_1] [student_2]
 
 To see all students and their counts run:
-$ python3 pairs -c [cohort_name]
-"""
+$ python3 pairs -c [cohort_name]"""
 
     print(message)
 
@@ -182,7 +183,10 @@ def main(flag, cohort_name=None, *names):
 if __name__ == '__main__':
     from sys import argv
 
-    main(*argv[1:])
+    if len(argv) < 2:
+        help()
+    else:
+        main(*argv[1:])
 
 
 # TODO: add doc strings and comments
