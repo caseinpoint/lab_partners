@@ -3,8 +3,7 @@ from json import load as js_load
 from pickle import load as pk_load
 from pickle import dump as pk_dump
 from random import shuffle
-# from sys import argv
-# from os.path import exists
+from os.path import exists
 
 
 class Cohort:
@@ -41,16 +40,16 @@ class Cohort:
 
             self.roster[student].update(other_students)
 
-    def prevent_pairing(self, students):
-        self.roster[students[0]].update({students[1]: 10})
-        self.roster[students[1]].update({students[0]: 10})
+    def prevent_pairing(self, student_1, student_2):
+        self.roster[student_1].update({student_2: len(self.roster)})
+        self.roster[student_2].update({student_1: len(self.roster)})
 
     def get_least_pairs(self, unavailable=set()):
         lowest_sum = float('inf')
         result = None
 
-        items = list(self.roster.items())
-        for student, counts in items:
+        names_counts = list(self.roster.items())
+        for student, counts in names_counts:
             if student in unavailable:
                 continue
 
@@ -74,7 +73,6 @@ class Cohort:
         return result
 
     def find_pair(self, first_student, unavailable=set()):
-        # TODO: change this to just pair and create add_partner method
         pair = [first_student]
         students = self._shuffle_common(first_student)
 
@@ -132,12 +130,48 @@ def print_sorted(groups):
     groups.sort()
 
     for group in groups:
-        # print(','.join(group))
-        print(' & '.join(group))
+        print(','.join(group))
+        # print(' & '.join(group))
 
 
-# TODO: create main function and if __name__ == '__main__'
-# TODO: test with absent students, and prevent_pairing()
+def help():
+    message = \
+    """help message goes here"""
+
+    print(message)
+
+
+def main(flag, cohort_name=None, *names):
+    if flag == '-h' or not exists(f'{cohort_name}.json'):
+        help()
+        return
+
+    if exists(f'{cohort_name}.bin'):
+        cohort = Cohort.load(cohort_name)
+    else:
+        cohort = Cohort(cohort_name)
+
+    if flag == '-g':
+        pairs = cohort.generate_pairs(set(names))
+        print_sorted(pairs)
+
+    elif flag == '-p':
+        cohort.prevent_pairing(*names)
+        print(f'Updated: {names}')
+
+    elif flag == '-c':
+        for student, counts in sorted(cohort.roster.items()):
+            print(f'{student}: {counts}\n')
+
+    cohort.save()
+
+
+if __name__ == '__main__':
+    from sys import argv
+
+    main(*argv[1:])
+
+
 # TODO: add doc strings and comments
 # TODO: create README
 # TODO: create remote and push
