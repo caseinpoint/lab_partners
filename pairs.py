@@ -175,25 +175,25 @@ def print_sorted(groups: list) -> None:
         print(' & '.join(group))
 
 
-def help():
+def help() -> None:
     message = """~~~ Student Lab Partner Script ~~~
 
 An array of student names saved as "[cohort_name].json" in this directory is
 required. Replace any spaces with underscores.
 
 To generate new pairs run:
-$ python3 pairs -g [cohort_name] [space-separated list of absent students]
+$ python3 pairs.py -g [cohort_name] [space-separated list of absent students]
 
 To reduce the probability of two students being paired in the future run:
-$ python3 pairs -p [cohort_name] [student_1] [student_2]
+$ python3 pairs.py -p [cohort_name] [student_1] [student_2]
 
 To see all students and their counts run:
-$ python3 pairs -c [cohort_name]"""
+$ python3 pairs.py -c [cohort_name]"""
 
     print(message)
 
 
-def main(flag, cohort_name=None, *names):
+def main(flag, cohort_name: str = None, *names) -> None:
     if flag == '-h' or not exists(f'{cohort_name}.json'):
         help()
         return
