@@ -1,3 +1,4 @@
+from annotation_demo import timed
 from collections import Counter
 from json import load as js_load
 from pickle import load as pk_load
@@ -7,7 +8,7 @@ from os.path import exists
 
 
 class Cohort:
-    def __init__(self, name, roster=None):
+    def __init__(self, name: str, roster: dict = None) -> None:
         self.name = name
 
         if roster is not None:
@@ -15,7 +16,12 @@ class Cohort:
         else:
             self._generate_roster()
 
-    def _generate_roster(self):
+    def _generate_roster(self) -> None:
+        """Load a list of students from JSON and set the instance roster.
+
+        Roster will be a dictionary with a collections.Counter for each student
+        to track how many times they've been paired with every other student"""
+
         with open(f'{self.name}.json', 'r') as f:
             names_list = js_load(f)
 
@@ -23,28 +29,40 @@ class Cohort:
         for name in names_list:
             self.roster[name] = Counter({n:0 for n in names_list if n != name})
 
-    def save(self):
+    def save(self) -> None:
+        """Cache the student roster."""
+
         with open(f'{self.name}.bin', 'wb') as f:
             pk_dump(obj=self.roster, file=f)
 
     @classmethod
-    def load(cls, name):
+    def load(cls, name: str) -> 'Cohort':
+        """Load a cached roster and return a new Cohort instance."""
+
         with open(f'{name}.bin', 'rb') as f:
             roster = pk_load(f)
 
         return cls(name, roster)
 
-    def _update_roster(self, students):
+    def _update_roster(self, students) -> None:
+        """Update roster counts for all students in a group."""
+
         for student in students:
             other_students = [s for s in students if s != student]
 
             self.roster[student].update(other_students)
 
-    def prevent_pairing(self, student_1, student_2):
+    def prevent_pairing(self, student_1, student_2) -> None:
+        """Reduce chances of being paired in the future for two students."""
+
         self.roster[student_1].update({student_2: len(self.roster)})
         self.roster[student_2].update({student_1: len(self.roster)})
 
-    def get_least_pairs(self, unavailable=set()):
+    def get_least_pairs(self, unavailable: set) -> str:
+        """Return the student with the least amount of past partners.
+
+        If multiple results, return the first encountered."""
+
         lowest_sum = float('inf')
         result = None
 
@@ -62,7 +80,12 @@ class Cohort:
         return result
 
     @staticmethod
-    def _shuffle_common(tuples_list):
+    def _shuffle_common(tuples_list: list) -> list:
+        """Shuffle a list of tuples and return a list of names.
+
+        tuples_list must be a list of tuples, as returned by
+        Counter.most_common().  Returns list in ascending order by count."""
+
         result = []
 
         for n in range(tuples_list[-1][-1], tuples_list[0][-1] + 1):
@@ -72,7 +95,12 @@ class Cohort:
 
         return result
 
-    def find_pair(self, first_student, unavailable=set()):
+    def find_pair(self, first_student: str, unavailable: set) -> list:
+        """Return a pair of students.
+
+        Finds an available pair for first_student based on lowest shared
+        count."""
+
         pair = [first_student]
         students = Cohort._shuffle_common(
             self.roster[first_student].most_common())
@@ -84,7 +112,12 @@ class Cohort:
             pair.append(student)
             return pair
 
-    def add_partner(self, group, unavailable=set()):
+    def add_partner(self, group: list, unavailable: set) -> list:
+        """Find a valid partner and append it to group.
+
+        Finds an available partner based on the lowest sum of counts for the
+        entire group."""
+
         sum_counts = Counter()
 
         for student in group:
@@ -98,7 +131,10 @@ class Cohort:
             group.append(student)
             return group
 
-    def generate_pairs(self, unavailable=set()):
+    @timed
+    def generate_pairs(self, unavailable: set) -> list:
+        """Return a list of groups."""
+
         groups = []
 
         all_students = sorted(self.roster.keys())
@@ -127,14 +163,16 @@ class Cohort:
         return groups
 
 
-def print_sorted(groups):
+def print_sorted(groups: list) -> None:
+    """Sort 2D list and print rows."""
+
     for group in groups:
         group.sort()
     groups.sort()
 
     for group in groups:
-        print(','.join(group))
-        # print(' & '.join(group))
+        # print(','.join(group))
+        print(' & '.join(group))
 
 
 def help():
@@ -187,8 +225,3 @@ if __name__ == '__main__':
         help()
     else:
         main(*argv[1:])
-
-
-# TODO: add doc strings and comments
-# TODO: create README
-# TODO: create remote and push
