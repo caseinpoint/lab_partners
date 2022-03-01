@@ -55,6 +55,10 @@ class Cohort:
     def prevent_pairing(self, student_1, student_2) -> None:
         """Reduce chances of being paired in the future for two students."""
 
+        # FIXME: this method works to reduce chances of pairing in future,
+        # but also will reduce the chances of being selected for future groups
+        # of three. refactor needed
+
         self.roster[student_1].update({student_2: len(self.roster)})
         self.roster[student_2].update({student_1: len(self.roster)})
 
@@ -112,6 +116,14 @@ class Cohort:
             pair.append(student)
             return pair
 
+    def get_triple(self, unavailable: set) -> list:
+        """Return a list of 3 students.
+
+        Finds a group of three that has the lowest shared count for all."""
+
+        # TODO: sum all student counts and pick the lowest 3
+        pass
+
     def add_partner(self, group: list, unavailable: set) -> list:
         """Find a valid partner and append it to group.
 
@@ -137,11 +149,16 @@ class Cohort:
 
         groups = []
 
-        all_students = sorted(self.roster.keys())
+        all_students = sorted(self.roster.keys(), reverse=True)
+        # all_students = list(self.roster.keys())
+        # shuffle(all_students)
 
         num_present = len(all_students) - len(unavailable)
 
+        # Check if odd number of students
         if num_present % 2 == 1:
+            # Student w/ least pairs indicates least amount of times in group
+            # of 3, or has absences. Select them for group of 3 this time.
             first_student = self.get_least_pairs(unavailable)
             first_pair = self.find_pair(first_student, unavailable)
             first_group = self.add_partner(first_pair, unavailable)
@@ -164,15 +181,15 @@ class Cohort:
 
 
 def print_sorted(groups: list) -> None:
-    """Sort 2D list and print rows."""
+    """Sort 2D list and pprint rows."""
 
     for group in groups:
         group.sort()
     groups.sort()
 
     for group in groups:
-        # print(','.join(group))
-        print(' & '.join(group))
+        print(','.join(group))
+        # print(' & '.join(group))
 
 
 def help() -> None:
@@ -204,16 +221,23 @@ def main(flag, cohort_name: str = None, *names) -> None:
         cohort = Cohort(cohort_name)
 
     if flag == '-g':
-        pairs = cohort.generate_pairs(set(names))
+        absent = set(names)
+        pairs = cohort.generate_pairs(absent)
         print_sorted(pairs)
 
     elif flag == '-p':
-        cohort.prevent_pairing(*names)
-        print(f'Increased counts by {len(cohort.roster)}: {names}')
+        if len(names) != 2:
+            help()
+        else:
+            cohort.prevent_pairing(*names)
+            print(f'Increased counts by {len(cohort.roster)}: {names}')
 
     elif flag == '-c':
         for student, counts in sorted(cohort.roster.items()):
-            print(f'{student}: {counts}\n')
+            print(f'{student}: {counts}, sum: {sum(counts.values())}\n')
+
+    else:
+        help()
 
     cohort.save()
 
