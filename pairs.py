@@ -1,4 +1,4 @@
-from annotation_demo import timed
+# from annotation_demo import timed
 from collections import Counter
 from json import load as js_load
 from pickle import load as pk_load
@@ -116,14 +116,6 @@ class Cohort:
             pair.append(student)
             return pair
 
-    def get_triple(self, unavailable: set) -> list:
-        """Return a list of 3 students.
-
-        Finds a group of three that has the lowest shared count for all."""
-
-        # TODO: sum all student counts and pick the lowest 3
-        pass
-
     def add_partner(self, group: list, unavailable: set) -> list:
         """Find a valid partner and append it to group.
 
@@ -143,7 +135,7 @@ class Cohort:
             group.append(student)
             return group
 
-    @timed
+    # @timed
     def generate_pairs(self, unavailable: set) -> list:
         """Return a list of groups."""
 
@@ -180,7 +172,7 @@ class Cohort:
         return groups
 
 
-def print_sorted(groups: list) -> None:
+def print_sorted(groups: list, separator: str = ' & ') -> None:
     """Sort 2D list and pprint rows."""
 
     for group in groups:
@@ -188,8 +180,7 @@ def print_sorted(groups: list) -> None:
     groups.sort()
 
     for group in groups:
-        print(','.join(group))
-        # print(' & '.join(group))
+        print(separator.join(group))
 
 
 def help() -> None:
@@ -224,6 +215,7 @@ def main(flag, cohort_name: str = None, *names) -> None:
         absent = set(names)
         pairs = cohort.generate_pairs(absent)
         print_sorted(pairs)
+        cohort.save()
 
     elif flag == '-p':
         if len(names) != 2:
@@ -236,10 +228,15 @@ def main(flag, cohort_name: str = None, *names) -> None:
         for student, counts in sorted(cohort.roster.items()):
             print(f'{student}: {counts}, sum: {sum(counts.values())}\n')
 
+    # for testing purposes
+    elif flag == '-t':
+        for _ in range(len(cohort.roster)):
+            absent = set(names)
+            pairs = cohort.generate_pairs(absent)
+            print_sorted(pairs, separator=',')
+
     else:
         help()
-
-    cohort.save()
 
 
 if __name__ == '__main__':
