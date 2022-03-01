@@ -143,7 +143,7 @@ class Cohort:
 
         groups = []
 
-        all_students = sorted(self.roster.keys(), reverse=False)
+        all_students = sorted(self.roster.keys(), reverse=True)
         # all_students = list(self.roster.keys())
         # shuffle(all_students)
 
@@ -234,7 +234,7 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
 
     # for testing purposes
     elif flag == '-t':
-        for _ in range(len(cohort.roster) + 4):
+        for _ in range(len(cohort.roster) + 1):
             absent = set(names)
             pairs = cohort.generate_pairs(absent)
             print_sorted(pairs, separator=',')
