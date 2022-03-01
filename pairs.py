@@ -141,9 +141,9 @@ class Cohort:
 
         groups = []
 
-        all_students = sorted(self.roster.keys(), reverse=True)
-        # all_students = list(self.roster.keys())
-        # shuffle(all_students)
+        # all_students = sorted(self.roster.keys(), reverse=True)
+        all_students = list(self.roster.keys())
+        shuffle(all_students)
 
         num_present = len(all_students) - len(unavailable)
 
@@ -187,7 +187,7 @@ def help() -> None:
     message = """~~~ Student Lab Partner Script ~~~
 
 An array of student names saved as "[cohort_name].json" in this directory is
-required. Replace any spaces with underscores.
+required. Replace any spaces in their names with underscores.
 
 To generate new pairs run:
 $ python3 pairs.py -g [cohort_name] [space-separated list of absent students]
@@ -201,7 +201,8 @@ $ python3 pairs.py -c [cohort_name]"""
     print(message)
 
 
-def main(flag, cohort_name: str = None, *names) -> None:
+# @timed
+def main(flag: str, cohort_name: str = None, *names) -> None:
     if flag == '-h' or not exists(f'{cohort_name}.json'):
         help()
         return
@@ -223,6 +224,7 @@ def main(flag, cohort_name: str = None, *names) -> None:
         else:
             cohort.prevent_pairing(*names)
             print(f'Increased counts by {len(cohort.roster)}: {names}')
+            cohort.save()
 
     elif flag == '-c':
         for student, counts in sorted(cohort.roster.items()):
@@ -230,13 +232,10 @@ def main(flag, cohort_name: str = None, *names) -> None:
 
     # for testing purposes
     elif flag == '-t':
-        for _ in range(len(cohort.roster)):
+        for _ in range(len(cohort.roster) - 1):
             absent = set(names)
             pairs = cohort.generate_pairs(absent)
             print_sorted(pairs, separator=',')
-
-    else:
-        help()
 
 
 if __name__ == '__main__':
