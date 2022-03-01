@@ -106,10 +106,11 @@ class Cohort:
         count."""
 
         pair = [first_student]
-        students = Cohort._shuffle_common(
-            self.roster[first_student].most_common())
+        # students = Cohort._shuffle_common(
+        #     self.roster[first_student].most_common())
 
-        for student in students:
+        # for student in students:
+        for student, _ in reversed(self.roster[first_student].most_common()):
             if student in unavailable:
                 continue
 
@@ -127,8 +128,9 @@ class Cohort:
         for student in group:
             sum_counts.update(self.roster[student])
 
-        students = Cohort._shuffle_common(sum_counts.most_common())
-        for student in students:
+        # students = Cohort._shuffle_common(sum_counts.most_common())
+        # for student in students:
+        for student, _ in reversed(sum_counts.most_common()):
             if student in unavailable or student in group:
                 continue
 
@@ -141,9 +143,9 @@ class Cohort:
 
         groups = []
 
-        # all_students = sorted(self.roster.keys(), reverse=True)
-        all_students = list(self.roster.keys())
-        shuffle(all_students)
+        all_students = sorted(self.roster.keys(), reverse=False)
+        # all_students = list(self.roster.keys())
+        # shuffle(all_students)
 
         num_present = len(all_students) - len(unavailable)
 
@@ -232,7 +234,7 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
 
     # for testing purposes
     elif flag == '-t':
-        for _ in range(len(cohort.roster) - 1):
+        for _ in range(len(cohort.roster) + 4):
             absent = set(names)
             pairs = cohort.generate_pairs(absent)
             print_sorted(pairs, separator=',')
