@@ -1,3 +1,4 @@
+# this doesn't need to be in main branch anymore, moving to 'legacy' branch
 from random import shuffle
 from sys import argv
 

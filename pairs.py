@@ -141,7 +141,6 @@ class Cohort:
 
         groups = []
 
-        # all_students = sorted(self.roster.keys(), reverse=True)
         all_students = list(self.roster.keys())
         shuffle(all_students)
 

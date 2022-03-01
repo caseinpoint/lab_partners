@@ -4,6 +4,8 @@ First, create a JSON file with an array of student names. Then, run this script
 with the cohort name as the first argument, and the names of any absent
 students as subsequent arguments."""
 
+# this doesn't need to be in main branch anymore, moving to 'legacy' branch
+
 from functools import cached_property
 from json import load as js_load
 from pickle import load as pk_load
