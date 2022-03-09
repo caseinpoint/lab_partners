@@ -1,10 +1,11 @@
-# from annotation_demo import timed
+from annotation_demo import timed
 from collections import Counter
 from json import load as js_load
 from pickle import load as pk_load
 from pickle import dump as pk_dump
 from random import shuffle
 from os.path import exists
+from typing import Iterable
 
 
 class Cohort:
@@ -23,11 +24,11 @@ class Cohort:
         to track how many times they've been paired with every other student"""
 
         with open(f'{self.name}.json', 'r') as f:
-            names_list = js_load(f)
+            names = js_load(f)
 
         self.roster = {}
-        for name in names_list:
-            self.roster[name] = Counter({n:0 for n in names_list if n != name})
+        for name in names:
+            self.roster[name] = Counter({n: 0 for n in names if n != name})
 
     def save(self) -> None:
         """Cache the student roster."""
@@ -44,11 +45,11 @@ class Cohort:
 
         return cls(name, roster)
 
-    def _update_roster(self, students) -> None:
+    def update_roster(self, students: Iterable, incr: int = 1) -> None:
         """Update roster counts for all students in a group."""
 
         for student in students:
-            other_students = [s for s in students if s != student]
+            other_students = {s: incr for s in students if s != student}
 
             self.roster[student].update(other_students)
 
@@ -57,7 +58,7 @@ class Cohort:
 
         # FIXME: this method works to reduce chances of pairing in future,
         # but also will reduce the chances of being selected for future groups
-        # of three. refactor needed
+        # of three for both students. refactor needed
 
         self.roster[student_1].update({student_2: len(self.roster)})
         self.roster[student_2].update({student_1: len(self.roster)})
@@ -85,15 +86,19 @@ class Cohort:
 
     @staticmethod
     def _shuffle_common(tuples_list: list) -> list:
-        """Shuffle a list of tuples and return a list of names.
+        """Shuffle a list of tuples and return a list of strings.
 
         tuples_list must be a list of tuples, as returned by
-        Counter.most_common().  Returns list in ascending order by count."""
+        Counter.most_common().  Returns list of shuffled names in ascending
+        order by count."""
 
         result = []
 
+        # loop over all counts in list
         for n in range(tuples_list[-1][-1], tuples_list[0][-1] + 1):
+            # create list of names with that count
             sub_group = [s for s, c in tuples_list if c == n]
+
             shuffle(sub_group)
             result.extend(sub_group)
 
@@ -135,7 +140,6 @@ class Cohort:
             group.append(student)
             return group
 
-    # @timed
     def generate_pairs(self, unavailable: set) -> list:
         """Return a list of groups."""
 
@@ -157,7 +161,7 @@ class Cohort:
             groups.append(first_group)
 
             unavailable.update(first_group)
-            self._update_roster(first_group)
+            self.update_roster(first_group)
 
         for student in all_students:
             if student in unavailable:
@@ -167,7 +171,7 @@ class Cohort:
             groups.append(pair)
 
             unavailable.update(pair)
-            self._update_roster(pair)
+            self.update_roster(pair)
 
         return groups
 
@@ -192,6 +196,9 @@ required. Replace any spaces in their names with underscores.
 To generate new pairs run:
 $ python3 pairs.py -g [cohort_name] [space-separated list of absent students]
 
+To increment/decrement the counts for an individual group run:
+$ python3 pairs.py [-i/-d] [cohort_name] [space-separated list of students]
+
 To reduce the probability of two students being paired in the future run:
 $ python3 pairs.py -p [cohort_name] [student_1] [student_2]
 
@@ -201,7 +208,7 @@ $ python3 pairs.py -c [cohort_name]"""
     print(message)
 
 
-# @timed
+@timed
 def main(flag: str, cohort_name: str = None, *names) -> None:
     if flag == '-h' or not exists(f'{cohort_name}.json'):
         help()
@@ -212,27 +219,42 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
     else:
         cohort = Cohort(cohort_name)
 
+    # generate pairs
     if flag == '-g':
         absent = set(names)
         pairs = cohort.generate_pairs(absent)
         print_sorted(pairs)
         cohort.save()
 
+    # prevent future pairing
     elif flag == '-p':
         if len(names) != 2:
             help()
         else:
             cohort.prevent_pairing(*names)
-            print(f'Increased counts by {len(cohort.roster)}: {names}')
             cohort.save()
+            print(f'Increased counts by {len(cohort.roster)}: {names}')
 
+    # increment the counts for a group
+    elif flag == '-i':
+        cohort.update_roster(names)
+        cohort.save()
+        print(f'Incremented counts for {names} by one.')
+
+    # decrement the counts for a group
+    elif flag == '-d':
+        cohort.update_roster(names, incr=-1)
+        cohort.save()
+        print(f'Decremented counts for {names} by one.')
+
+    # show all counts
     elif flag == '-c':
         for student, counts in sorted(cohort.roster.items()):
             print(f'{student}: {counts}, sum: {sum(counts.values())}\n')
 
-    # for testing purposes
+    # generate many groups w/out saving for testing purposes
     elif flag == '-t':
-        for _ in range(len(cohort.roster) - 1):
+        for _ in range(len(cohort.roster) + 1):
             absent = set(names)
             pairs = cohort.generate_pairs(absent)
             print_sorted(pairs, separator=',')
