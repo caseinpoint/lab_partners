@@ -1,4 +1,3 @@
-from annotation_demo import timed
 from collections import Counter
 from json import load as js_load
 from pickle import load as pk_load
@@ -208,7 +207,6 @@ $ python3 pairs.py -c [cohort_name]"""
     print(message)
 
 
-@timed
 def main(flag: str, cohort_name: str = None, *names) -> None:
     if flag == '-h' or not exists(f'{cohort_name}.json'):
         help()
