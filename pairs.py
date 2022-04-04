@@ -8,6 +8,8 @@ from typing import Iterable
 
 
 class Cohort:
+    """A data structure for storing students' lab pair counts."""
+
     def __init__(self, name: str, roster: dict = None) -> None:
         self.name = name
 
@@ -186,8 +188,10 @@ def print_sorted(groups: list, separator: str = ' & ') -> None:
         print(separator.join(group))
 
 
-def help() -> None:
-    message = """~~~ Student Lab Partner Script ~~~
+def script_help() -> None:
+    """Print a help message."""
+
+    MESSAGE = """~~~ Student Lab Partner Script ~~~
 
 An array of student names saved as "[cohort_name].json" in this directory is
 required. Replace any spaces in their names with underscores.
@@ -204,12 +208,14 @@ $ python3 pairs.py -p [cohort_name] [student_1] [student_2]
 To see all students and their counts run:
 $ python3 pairs.py -c [cohort_name]"""
 
-    print(message)
+    print(MESSAGE)
 
 
 def main(flag: str, cohort_name: str = None, *names) -> None:
+    """Parse CLI arguments and run commands."""
+
     if flag == '-h' or not exists(f'{cohort_name}.json'):
-        help()
+        script_help()
         return
 
     if exists(f'{cohort_name}.bin'):
@@ -227,7 +233,7 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
     # prevent future pairing
     elif flag == '-p':
         if len(names) != 2:
-            help()
+            script_help()
         else:
             cohort.prevent_pairing(*names)
             cohort.save()
@@ -262,6 +268,6 @@ if __name__ == '__main__':
     from sys import argv
 
     if len(argv) < 2:
-        help()
+        script_help()
     else:
         main(*argv[1:])
