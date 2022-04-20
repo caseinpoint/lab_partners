@@ -8,7 +8,7 @@ from typing import Iterable
 
 
 class Cohort:
-    """A data structure for storing students' lab pair counts."""
+    """A data structure for storing and generating students' lab pairs."""
 
     def __init__(self, name: str, roster: dict = None) -> None:
         self.name = name
@@ -54,7 +54,26 @@ class Cohort:
 
             self.roster[student].update(other_students)
 
-    def prevent_pairing(self, student_1, student_2) -> None:
+    def remove_student(self, student: str) -> None:
+        """Remove a student from the roster."""
+
+        self.roster.pop(student, None)
+
+        for student_counter in self.roster.values():
+            student_counter.pop(student, None)
+
+    def add_student(self, new_student: str) -> None:
+        """Add a new student to the roster."""
+
+        new_counter = Counter()
+
+        for student, student_counts in self.roster.items():
+            student_counts.update({new_student: 0})
+            new_counter.update({student: 0})
+
+        self.roster[new_student] = new_counter
+
+    def prevent_pairing(self, student_1: str, student_2: str) -> None:
         """Reduce chances of being paired in the future for two students."""
 
         # FIXME: this method works to reduce chances of pairing in future,
@@ -193,20 +212,28 @@ def script_help() -> None:
 
     MESSAGE = """~~~ Student Lab Partner Script ~~~
 
-An array of student names saved as "[cohort_name].json" in this directory is
+An array of student names saved as "<cohort_name>.json" in this directory is
 required. Replace any spaces in their names with underscores.
 
-To generate new pairs run:
-$ python3 pairs.py -g [cohort_name] [space-separated list of absent students]
+To generate new pairs:
+$ python3 pairs.py -g <cohort_name> <space-separated list of absent students>
 
-To increment/decrement the counts for an individual group run:
-$ python3 pairs.py [-i/-d] [cohort_name] [space-separated list of students]
+To increment/decrement the counts for an individual group:
+$ python3 pairs.py <-i/-d> <cohort_name> <student_1> <student_2> <etc.>
 
-To reduce the probability of two students being paired in the future run:
-$ python3 pairs.py -p [cohort_name] [student_1] [student_2]
+To reduce the probability of two students being paired in the future:
+$ python3 pairs.py -p <cohort_name> <student_1> <student_2>
 
-To see all students and their counts run:
-$ python3 pairs.py -c [cohort_name]"""
+To remove a student from the roster:
+$ python3 pairs.py -r <cohort_name> <student>
+(It is recommended to remove the student from <cohort_name>.json, as well)
+
+To add a student to the roster:
+$ python3 pairs.py -a <cohort_name> <student>
+(It is recommended to add the student to <cohort_name>.json, as well)
+
+To see all students and their counts:
+$ python3 pairs.py -c <cohort_name>"""
 
     print(MESSAGE)
 
@@ -227,17 +254,38 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
     if flag == '-g':
         absent = set(names)
         pairs = cohort.generate_pairs(absent)
-        print_sorted(pairs)
         cohort.save()
+        print_sorted(pairs)
 
     # prevent future pairing
     elif flag == '-p':
         if len(names) != 2:
             script_help()
+
         else:
             cohort.prevent_pairing(*names)
             cohort.save()
-            print(f'Increased counts by {len(cohort.roster)}: {names}')
+            print(f'Increased counts by {len(cohort.roster)}: {names}.')
+
+    # remove student from roster
+    elif flag == '-r':
+        if len(names) != 1:
+            script_help()
+
+        else:
+            cohort.remove_student(names[0])
+            cohort.save()
+            print(f'Revomed {names[0]} from the roster.')
+
+    # add student to roster
+    elif flag == '-a':
+        if len(names) != 1:
+            script_help()
+
+        else:
+            cohort.add_student(names[0])
+            cohort.save()
+            print(f'Added {names[0]} to the roster.')
 
     # increment the counts for a group
     elif flag == '-i':
@@ -257,7 +305,7 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
             print(f'{student}: {counts}, sum: {sum(counts.values())}\n')
 
     # generate many groups w/out saving for testing purposes
-    elif flag == '-t':
+    elif flag == '--test':
         for _ in range(len(cohort.roster) + 1):
             absent = set(names)
             pairs = cohort.generate_pairs(absent)
