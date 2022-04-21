@@ -212,14 +212,15 @@ def script_help() -> None:
 
     MESSAGE = """~~~ Student Lab Partner Script ~~~
 
-An array of student names saved as "<cohort_name>.json" in this directory is
-required. Replace any spaces in their names with underscores.
+An array of student names saved in this directory as "<cohort_name>.json" is
+required. Replace any spaces in their names with underscores. See example.json
+included in repo.
 
 To generate new pairs:
 $ python3 pairs.py -g <cohort_name> <space-separated list of absent students>
 
 To increment/decrement the counts for an individual group:
-$ python3 pairs.py <-i/-d> <cohort_name> <student_1> <student_2> <etc.>
+$ python3 pairs.py <-i/-d> <cohort_name> <space-separated list of students>
 
 To reduce the probability of two students being paired in the future:
 $ python3 pairs.py -p <cohort_name> <student_1> <student_2>
