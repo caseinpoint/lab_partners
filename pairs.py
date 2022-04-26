@@ -78,9 +78,9 @@ class Cohort:
     def prevent_pairing(self, student_1: str, student_2: str) -> None:
         """Reduce chances of being paired in the future for two students."""
 
-        # FIXME: this method works to reduce chances of pairing in future,
-        # but also will reduce the chances of being selected for future groups
-        # of three for both students. refactor needed
+        # TODO: this method works to reduce chances of pairing in future,
+        # but also may reduce the chances of being selected for future groups
+        # of three for both students. testing needed.
 
         self.roster[student_1].update({student_2: len(self.roster)})
         self.roster[student_2].update({student_1: len(self.roster)})
