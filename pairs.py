@@ -57,14 +57,17 @@ class Cohort:
             self.roster[student].update(other_students)
 
     def bulk_update(self, others: Iterable) -> None:
-        """Update roster counts for all students in self with counts from other
-        chohorts/houses."""
+        """Bulk update roster counts.
+
+        Loop over others and add counts for existing students in self.roster.
+        """
 
         for house_name in others:
             other = Cohort.load(house_name)
 
             for student, counts in other.roster.items():
-                self.roster[student].update(counts)
+                if student in self.roster:
+                    self.roster[student].update(counts)
 
     def remove_student(self, student: str) -> None:
         """Remove a student from the roster."""
