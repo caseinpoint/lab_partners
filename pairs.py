@@ -56,6 +56,16 @@ class Cohort:
 
             self.roster[student].update(other_students)
 
+    def bulk_update(self, others: Iterable) -> None:
+        """Update roster counts for all students in self with counts from other
+        chohorts/houses."""
+
+        for house_name in others:
+            other = Cohort.load(house_name)
+
+            for student, counts in other.roster.items():
+                self.roster[student].update(counts)
+
     def remove_student(self, student: str) -> None:
         """Remove a student from the roster."""
 
@@ -224,6 +234,10 @@ $ python3 pairs.py -g <cohort_name> <space-separated list of absent students>
 To increment/decrement the counts for an individual group:
 $ python3 pairs.py <-i/-d> <cohort_name> <space-separated list of students>
 
+In the case of separate files for houses, update the counts of the full cohort
+with the counts from houses:
+$ python3 pairs.py -u <cohort_name> <space-separated list of house names>
+
 To reduce the probability of two students being paired in the future:
 $ python3 pairs.py -p <cohort_name> <student_1> <student_2>
 
@@ -235,7 +249,7 @@ To add a student to the roster:
 $ python3 pairs.py -a <cohort_name> <student>
 (It is recommended to add the student to <cohort_name>.json, as well)
 
-To see all students and their counts:
+To see all students and their counts (formated for .csv):
 $ python3 pairs.py -c <cohort_name>"""
 
     print(MESSAGE)
@@ -259,6 +273,24 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
         pairs = cohort.generate_pairs(absent)
         cohort.save()
         print_sorted(pairs)
+
+    # increment the counts for a group
+    elif flag == '-i':
+        cohort.update_roster(names)
+        cohort.save()
+        print(f'Incremented counts for {names} by one.')
+
+    # decrement the counts for a group
+    elif flag == '-d':
+        cohort.update_roster(names, incr=-1)
+        cohort.save()
+        print(f'Decremented counts for {names} by one.')
+
+    # update main cohort count with house(s) count
+    elif flag == '-u':
+        cohort.bulk_update(names)
+        cohort.save()
+        print(f'Updated cohort counts with counts from {names}.')
 
     # prevent future pairing
     elif flag == '-p':
@@ -290,22 +322,15 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
             cohort.save()
             print(f'Added {names[0]} to the roster.')
 
-    # increment the counts for a group
-    elif flag == '-i':
-        cohort.update_roster(names)
-        cohort.save()
-        print(f'Incremented counts for {names} by one.')
-
-    # decrement the counts for a group
-    elif flag == '-d':
-        cohort.update_roster(names, incr=-1)
-        cohort.save()
-        print(f'Decremented counts for {names} by one.')
-
     # show all counts
     elif flag == '-c':
         for student, counts in sorted(cohort.roster.items()):
-            print(f'{student}: {counts}, sum: {sum(counts.values())}\n')
+            for pair, count in sorted(counts.items(),
+                                      key=lambda t: t[1],
+                                      reverse=True):
+                print(f'{pair}, {count}', end=', ')
+            print(f'({student})')
+
 
     # generate many groups w/out saving for testing purposes
     elif flag == '--test':
