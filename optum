@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# create all optum1 pairs in one go
+
+printf "optum1amiga:"
+python3 pairs.py -g optum1amiga
+
+printf "\noptum1lynx:"
+python3 pairs.py -g optum1lynx
+
+python3 pairs.py -u optum1 optum1amiga optum1lynx
+
+printf "\noptum1"
+python3 pairs.py -g optum1
