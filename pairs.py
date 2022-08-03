@@ -328,16 +328,18 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
     # show all counts
     elif flag == '-c':
         for student, counts in sorted(cohort.roster.items()):
+            print(student, end=', ')
             for pair, count in sorted(counts.items(),
                                       key=lambda t: t[1],
                                       reverse=True):
                 print(f'{pair}, {count}', end=', ')
-            print(f'({student})')
+            print()
 
 
     # generate many groups w/out saving for testing purposes
     elif flag == '--test':
-        for _ in range(len(cohort.roster) + 1):
+        for i in range(len(cohort.roster) + 1):
+            print(i)
             absent = set(names)
             pairs = cohort.generate_pairs(absent)
             print_sorted(pairs, separator=',')
