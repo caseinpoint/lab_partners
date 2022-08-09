@@ -10,7 +10,7 @@ from typing import Iterable
 
 
 class Cohort:
-    """A data structure for storing and generating students' lab pairs."""
+    """Generates students' lab pairs, and saves pair history to reduce repeats."""
 
     def __init__(self, name: str, roster: dict = None) -> None:
         self.name = name
@@ -293,7 +293,7 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
     elif flag == '-u':
         cohort.bulk_update(names)
         cohort.save()
-        print(f'Updated cohort counts with counts from {names}.')
+        print(f'Updated {cohort_name} counts with counts from {names}.')
 
     # prevent future pairing
     elif flag == '-p':

@@ -2,15 +2,24 @@
 
 # create all optum1 pairs in one go
 
-absent=$@
+printf "Any Amiga students absent for the stretch exercise?\nList here: "
+read amigaabsent
+echo
+python3 pairs.py -g optum1amiga $amigaabsent
 
-printf "optum1amiga:"
-python3 pairs.py -g optum1amiga $absent
+printf "\nAny Lynx students absent for the stretch exercise?\nList here: "
+read lynxabsent
+echo
+python3 pairs.py -g optum1lynx $lynxabsent
 
-printf "\noptum1lynx:"
-python3 pairs.py -g optum1lynx $absent
-
+echo
 python3 pairs.py -u optum1 optum1amiga optum1lynx
 
-printf "\noptum1"
+printf "\nAny students absent for the afternoon lab?\nList here: "
+read absent
+echo
 python3 pairs.py -g optum1 $absent
+
+echo
+python3 pairs.py -u optum1amiga optum1
+python3 pairs.py -u optum1lynx optum1
