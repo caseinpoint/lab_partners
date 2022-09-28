@@ -222,6 +222,27 @@ def print_sorted(groups: list, separator: str = ' & ') -> None:
         print(separator.join(group))
 
 
+def print_csv(cohort: 'Cohort') -> None:
+    """Print Cohort in .csv format."""
+
+    students = sorted(cohort.roster.keys())
+    partners = sorted(cohort.roster.keys(), reverse=True)
+
+    print(',', end='')
+    for partner in partners:
+        print(partner, end=',')
+    print()
+
+    for student in students:
+        print(student, end=',')
+        for partner in partners:
+            if partner == student:
+                print('-', end=',')
+            else:
+                print(cohort.roster[student][partner], end=',')
+        print()
+
+
 def script_help() -> None:
     """Print a help message."""
 
@@ -237,7 +258,7 @@ $ python3 pairs.py -g <cohort_name> <space-separated list of absent students>
 To increment/decrement the counts for an individual group:
 $ python3 pairs.py <-i/-d> <cohort_name> <space-separated list of students>
 
-In the case of separate files for houses, update the counts of the full cohort
+In the case of separate JSON files for houses, update the counts of the full cohort
 with the counts from houses:
 $ python3 pairs.py -u <cohort_name> <space-separated list of house names>
 
@@ -327,13 +348,7 @@ def main(flag: str, cohort_name: str = None, *names) -> None:
 
     # show all counts
     elif flag == '-c':
-        for student, counts in sorted(cohort.roster.items()):
-            print(student, end=', ')
-            for pair, count in sorted(counts.items(),
-                                      key=lambda t: t[1],
-                                      reverse=True):
-                print(f'{pair}, {count}', end=', ')
-            print()
+        print_csv(cohort)
 
 
     # generate many groups w/out saving for testing purposes
