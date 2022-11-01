@@ -13,11 +13,11 @@
       crossorigin="anonymous"
     />
 
-    <title>caseinpoint's lab pairs tool</title>
+    <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
     <div class="container-fluid">
-      <h1>test</h1>
+      {% block container %}{% endblock %}
     </div>
 
     <!-- Bootstrap JS -->
