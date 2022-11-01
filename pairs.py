@@ -43,7 +43,7 @@ class Cohort:
     def load(cls, name: str) -> 'Cohort':
         """Load a cached roster and return a new Cohort instance."""
 
-        with open(f'./data/bin/{name}.pickle', 'rb') as f:
+        with open(f'./data/pickle/{name}.pickle', 'rb') as f:
             roster = pk_load(f)
 
         return cls(name, roster)
