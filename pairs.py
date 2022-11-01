@@ -26,7 +26,7 @@ class Cohort:
         Roster will be a dictionary with a collections.Counter for each student
         to track how many times they've been paired with every other student"""
 
-        with open(f'{self.name}.json', 'r') as f:
+        with open(f'./data/json/{self.name}.json', 'r') as f:
             names = js_load(f)
 
         self.roster = {}
@@ -36,14 +36,14 @@ class Cohort:
     def save(self) -> None:
         """Cache the student roster."""
 
-        with open(f'{self.name}.bin', 'wb') as f:
+        with open(f'./data/pickle/{self.name}.pickle', 'wb') as f:
             pk_dump(obj=self.roster, file=f)
 
     @classmethod
     def load(cls, name: str) -> 'Cohort':
         """Load a cached roster and return a new Cohort instance."""
 
-        with open(f'{name}.bin', 'rb') as f:
+        with open(f'./data/bin/{name}.pickle', 'rb') as f:
             roster = pk_load(f)
 
         return cls(name, roster)
@@ -282,11 +282,11 @@ $ python3 pairs.py -c <cohort_name>"""
 def main(flag: str, cohort_name: str = None, *names) -> None:
     """Parse CLI arguments and run commands."""
 
-    if flag == '-h' or not exists(f'{cohort_name}.json'):
+    if flag == '-h' or not exists(f'./data/json/{cohort_name}.json'):
         script_help()
         return
 
-    if exists(f'{cohort_name}.bin'):
+    if exists(f'./data/pickle/{cohort_name}.pickle'):
         cohort = Cohort.load(cohort_name)
     else:
         cohort = Cohort(cohort_name)

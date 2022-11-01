@@ -1,4 +1,5 @@
-*.bin
 *.json
 !example.json
+*.pickle
+!example.pickle
 __pycache__/
