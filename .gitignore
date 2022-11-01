@@ -3,3 +3,5 @@
 *.pickle
 !example.pickle
 __pycache__/
+env/
+.DS_Store
