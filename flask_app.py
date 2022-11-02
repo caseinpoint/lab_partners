@@ -62,6 +62,19 @@ def new_cohort():
     return redirect(f'/cohorts/{slug}')
 
 
+@app.route('/cohorts/<slug>')
+def cohort_details(slug):
+    """View cohort details page."""
+
+    if slug not in get_cohort_slugs():
+        flash('Cohort slug not found.')
+        return redirect('/new')
+
+    cohort = Cohort.load(slug)
+
+    return render_template('cohort.html', cohort=cohort)
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run()
