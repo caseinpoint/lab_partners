@@ -16,9 +16,32 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
-    <div class="container-fluid">
-      {% block container %}{% endblock %}
-    </div>
+    <nav class="navbar navbar-expand-md bg-light">
+      <div class="container-fluid">
+        <span class="navbar-brand">Lab Pair Generator</span>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#nav_main"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav_main">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Cohorts</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/new">New Cohort</a>
+            </li>
+            {% block nav %}{% endblock %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">{% block container %}{% endblock %}</div>
 
     <!-- Bootstrap JS -->
     <script
@@ -26,5 +49,7 @@
       integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
       crossorigin="anonymous"
     ></script>
+
+    {% block script %}{% endblock %}
   </body>
 </html>
