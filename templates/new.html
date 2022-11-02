@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Lab Pairs | New Cohort{% endblock %}
+
+{%block container %}
+<h1>Add a new cohort</h1>
+
+<div class="row">
+  <div class="col-12 col-md-9 col-lg-6">
+    <form action="/new" method="post">
+      <div class="mb-3">
+        <label for="slug" class="form-label">Cohort slug</label>
+        <input type="text" class="form-control" name="slug" id="slug" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="students">Students' given names</label>
+        <p class="form-text" id="studentsHelp">
+          Student names must be whitespace separated (newline, space or tab). If a student has more than one name, combine them into one without whitespace.
+        </p>
+        <textarea
+          name="students"
+          class="form-control"
+          id="students"
+          aria-describedby="studentsHelp"
+          rows="15"
+          required
+        ></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{% endblock %}
