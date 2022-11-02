@@ -36,12 +36,38 @@
               <a class="nav-link" href="/new">New Cohort</a>
             </li>
             {% block nav %}{% endblock %}
+            <li class="nav-item">
+              <a class="nav-link" href="/about">About</a>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <div class="container">{% block container %}{% endblock %}</div>
+    <div class="container">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="row">
+            {% for message in messages %}
+              <div
+                class="alert alert-warning alert-dismissable fade show col-12 col-md-9 col-lg-6"
+                role="alert"
+              >
+                {{ message }}
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block container %}{% endblock %}
+    </div>
 
     <!-- Bootstrap JS -->
     <script
