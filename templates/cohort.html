@@ -1,9 +1,78 @@
 {% extends 'base.html' %}
 
-{% block title %}Lab Pairs | {{cohort.name}}{% endblock %}
+{% block title %}Lab Pairs | {{slug}}{% endblock %}
 
 {%block container %}
-<h1>Cohort: {{cohort.name}}</h1>
+<div class="row">
+  <div class="col-3">
+    <h1>Cohort: {{slug}}</h1>
+  </div>
+
+  <div class="col pt-2">
+    <div class="btn-group" role="group">
+      <a
+      class="btn btn-outline-success"
+      href="/cohorts/{{slug}}/edit"
+    >
+      Edit
+    </a>
+    <a
+      class="btn btn-outline-danger btn_delete"
+      href="/cohorts/{{slug}}/delete"
+    >
+      Delete
+    </a>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <h2>Student counts:</h2>
+    <table class="table table-sm table-bordered">
+      <thead>
+        <tr>
+          <th scope="col" id="cell-0-0"></th>
+          {% for h in range(1, counts[0]|length) %}
+            <th
+              scope="col"
+              id="cell-0-{{h}}"
+              class="text-center"
+            >
+              {{counts[0][h]}}
+            </th>
+          {% endfor %}
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for r in range(1, counts|length) %}
+          <tr>
+            <th
+              scope="row"
+              id="cell-{{r}}-0"
+              class="text-end"
+            >
+              {{counts[r][0]}}
+            </th>
+            {% for c in range(1, counts[r]|length) %}
+              {% if counts[r][c] is not none %}
+                <td
+                  id="cell-{{r}}-{{c}}"
+                  class="text-center cell_count"
+                >
+                  {{counts[r][c]}}
+                </td>
+              {% else %}
+                <td id="cell-{{r}}-{{c}}" class="text-center cell_count">-</td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
 
 {% block script %}

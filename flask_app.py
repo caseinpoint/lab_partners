@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, session, flash
+from flask import Flask, request, render_template, redirect, jsonify, session, flash
 from glob import iglob
 from json import dump
 from os.path import exists
@@ -71,8 +71,10 @@ def cohort_details(slug):
         return redirect('/new')
 
     cohort = Cohort.load(slug)
+    num_students = len(cohort.roster)
+    counts = cohort.get_count_matrix()
 
-    return render_template('cohort.html', cohort=cohort)
+    return render_template('cohort.html', slug=slug, num_students=num_students, counts=counts)
 
 
 if __name__ == '__main__':
