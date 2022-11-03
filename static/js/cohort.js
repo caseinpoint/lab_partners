@@ -1,3 +1,4 @@
+/* cell highlighting: */
 const getCellHeaders = (cell) => {
     const coords = cell.id.split('-');
     const r = coords[1];
@@ -33,3 +34,47 @@ for (let cell of document.querySelectorAll('.cell_count')) {
     cell.addEventListener('mouseenter', handleCellMouseenter);
     cell.addEventListener('mouseleave', handleCellMouseleave);
 }
+
+
+/* generating pairs: */
+const updateCounts = (counts) => {
+    console.log(counts);
+    // TODO: implement
+};
+
+const handleFormGenerate = (evt) => {
+    evt.preventDefault();
+
+    const inputs = {absent: []};
+    for (let checkbox of document.querySelectorAll('.absent')) {
+        if (checkbox.checked) {
+            inputs.absent.push(checkbox.value);
+        }
+    }
+
+    inputs.slug = document.querySelector('#slug').value;
+
+    fetch('/api/generate', {
+        method: 'POST',
+        body: JSON.stringify(inputs),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        const resultsUL = document.querySelector('#pair_results');
+        resultsUL.innerHTML = '';
+
+        for (let pair of data.pairs) {
+            pairString = pair.join(' & ');
+            resultsUL.insertAdjacentHTML('beforeend',
+                                         `<li>${pairString}</li>`);
+        }
+
+        updateCounts(data.new_counts);
+    });
+};
+
+const formGenerate = document.querySelector('#form_generate');
+formGenerate.addEventListener('submit', handleFormGenerate);

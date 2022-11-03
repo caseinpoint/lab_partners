@@ -1,6 +1,7 @@
-from flask import Flask, request, render_template, redirect, jsonify, session, flash
+from flask import Flask, request, render_template, redirect, session, flash
 from glob import iglob
 from json import dump
+from os import remove
 from os.path import exists
 from pairs import Cohort
 
@@ -70,11 +71,51 @@ def cohort_details(slug):
         flash('Cohort slug not found.')
         return redirect('/new')
 
-    cohort = Cohort.load(slug)
+    if exists(f'./data/pickle/{slug}.pickle'):
+        cohort = Cohort.load(slug)
+    else:
+        cohort = Cohort(slug)
+        cohort.save()
+
     num_students = len(cohort.roster)
     counts = cohort.get_count_matrix()
 
     return render_template('cohort.html', slug=slug, num_students=num_students, counts=counts)
+
+
+@app.route('/cohorts/<slug>/delete')
+def delete_cohort(slug):
+    """Delete a cohort."""
+
+    try:
+        remove(f'./data/json/{slug}.json')
+        remove(f'./data/pickle/{slug}.pickle')
+    except FileNotFoundError as err:
+        print(err)
+
+    return redirect('/')
+
+@app.route('/api/generate', methods=['POST'])
+def generate_pairs():
+    """Generate cohort pairs and return JSON."""
+
+    slug = request.json.get('slug')
+
+    if slug is None or not exists(f'./data/pickle/{slug}.pickle'):
+        return {'success': False, 'error': 'Cohort not found.'}
+
+    cohort = Cohort.load(slug)
+    absent = set(request.json.get('absent', []))
+    pairs = cohort.generate_pairs(absent)
+    cohort.save()
+
+    new_counts = cohort.get_count_matrix()
+
+    return {
+        'success': True,
+        'pairs': pairs,
+        'new_counts': new_counts
+    }
 
 
 if __name__ == '__main__':
