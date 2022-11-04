@@ -15,6 +15,11 @@ const handleCellMouseenter = (evt) => {
 
     const {colHeaderCell, rowHeaderCell} = getCellHeaders(cell);
 
+    // check if cell was highlighted in updateCounts() and remove
+    if (cell.checked) {
+        cell.classList.remove('bg-light');
+    }
+
     cell.classList.add('bg-warning');
     colHeaderCell.classList.add('bg-warning');
     rowHeaderCell.classList.add('bg-warning');
@@ -28,6 +33,11 @@ const handleCellMouseleave = (evt) => {
     cell.classList.remove('bg-warning');
     colHeaderCell.classList.remove('bg-warning');
     rowHeaderCell.classList.remove('bg-warning');
+
+    // replace previous highlighting from updateCounts(), if any
+    if (cell.checked) {
+        cell.classList.add('bg-light');
+    }
 };
 
 for (let cell of document.querySelectorAll('.cell_count')) {
@@ -38,8 +48,28 @@ for (let cell of document.querySelectorAll('.cell_count')) {
 
 /* generating pairs: */
 const updateCounts = (counts) => {
-    console.log(counts);
-    // TODO: implement
+    for (let r = 1; r < counts.length; r++) {
+        for (let c = 1; c < counts[r].length; c++) {
+            const cell = document.querySelector(`#cell-${r}-${c}`);
+
+            if (counts[r][c] !== null) {
+                // highlight count changes from most recent groups
+                if (cell.textContent != counts[r][c]) {
+                    cell.classList.add('bg-light');
+                    // cell.checked for removing/adding bg-light in mouseover
+                    cell.checked = true;
+                } else {
+                    // remove previous highlighting, if any
+                    cell.classList.remove('bg-light');
+                    cell.checked = false;
+                }
+
+                cell.textContent = counts[r][c];
+            } else {
+                cell.textContent = '-';
+            }
+        }
+    }
 };
 
 const handleFormGenerate = (evt) => {
