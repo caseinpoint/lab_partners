@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, session, flash
 from glob import iglob
-from json import dump
-from os import remove
+from json import dump, load
+from os import remove, rename
 from os.path import exists
 from pairs import Cohort
 
@@ -95,6 +95,75 @@ def delete_cohort(slug):
 
     return redirect('/')
 
+
+def update_cohort(slug, new_slug, to_remove, to_add):
+    """Update a cohort and save."""
+
+    if slug != new_slug:
+        rename(f'./data/json/{slug}.json',
+               f'./data/json/{new_slug}.json')
+        rename(f'./data/pickle/{slug}.pickle',
+               f'./data/pickle/{new_slug}.pickle')
+
+    cohort = Cohort.load(new_slug)
+    with open(f'./data/json/{new_slug}.json') as f:
+        orig_json = load(f)
+    orig_len = len(orig_json)
+
+    for student in to_remove:
+        cohort.remove_student(student)
+        orig_json.remove(student)
+
+    for student in to_add:
+        cohort.add_student(student)
+        orig_json.append(student)
+
+    if len(orig_json) != orig_len:
+        with open(f'./data/json/{new_slug}.json', 'w') as f:
+            dump(orig_json, f)
+
+    cohort.save()
+
+
+@app.route('/cohorts/<slug>/edit', methods=['GET', 'POST'])
+def edit_cohort(slug):
+    """Edit a cohort."""
+
+    if slug not in get_cohort_slugs():
+        flash('Cohort slug not found.')
+        return redirect('/new')
+
+    if request.method == 'GET':
+        if exists(f'./data/pickle/{slug}.pickle'):
+            cohort = Cohort.load(slug)
+        else:
+            cohort = Cohort(slug)
+            cohort.save()
+
+        students = sorted(cohort.roster.keys())
+
+        return render_template('edit.html', slug=slug, students=students)
+
+    new_slug = request.form.get('slug', '').strip()
+
+    if len(new_slug) < 1:
+        flash('Cohort slug is required')
+        return redirect(f'/cohorts/{slug}/edit')
+    if new_slug in get_cohort_slugs():
+        flash(f'{new_slug} already exists.')
+        return redirect(f'/cohorts/{slug}/edit')
+
+    students_to_remove = request.form.getlist('remove')
+
+    new_students = request.form.get('students', '').strip().split()
+
+    update_cohort(slug,
+                  new_slug,
+                  students_to_remove,
+                  new_students)
+
+    return redirect(f'/cohorts/{new_slug}')
+
 @app.route('/api/generate', methods=['POST'])
 def generate_pairs():
     """Generate cohort pairs and return JSON."""
@@ -111,11 +180,9 @@ def generate_pairs():
 
     new_counts = cohort.get_count_matrix()
 
-    return {
-        'success': True,
-        'pairs': pairs,
-        'new_counts': new_counts
-    }
+    return {'success': True,
+            'pairs': pairs,
+            'new_counts': new_counts}
 
 
 if __name__ == '__main__':
