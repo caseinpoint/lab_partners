@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Lab Pairs | Edit {{slug}}{% endblock %}
+
+{% block nav %}
+<li class="nav-item">
+  <a class="nav-link" href="/cohorts/{{slug}}">Back to: {{slug}}</a>
+</li>
+{% endblock %}
+
+{%block container %}
+<h1>Edit Cohort: {{slug}}</h1>
+
+<div class="row">
+  <div class="col-12 col-md-9 col-lg-6">
+    <form action="/cohorts/{{slug}}/edit" method="post">
+      <div class="mb-3">
+        <label for="slug" class="form-label">Cohort Slug</label>
+        <input
+          type="text"
+          class="form-control"
+          name="slug"
+          id="slug"
+          value="{{slug}}"
+          required
+        >
+      </div>
+
+      <div class="mb-3">
+        <h6>Remove Students</h6>
+        <p class="form-text" id="del_students_help">
+          Select any students you would like to remove from the cohort. Caution: you can add them back later, but their counts will be reset to 0. Be certain before you remove them.
+        </p>
+
+        <div class="row px-3" aria-describedby="del_students_help">
+        {% for student in students %}
+          <div class="form-check col-4">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="remove"
+              id="del_{{student}}"
+              value="{{student}}"
+            >
+            <label
+              for="del_{{student}}"
+              class="form-check-label"
+            >
+              {{student}}
+            </label>
+          </div>
+        {% endfor %}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="students">Add Students</label>
+        <p class="form-text" id="add_students_help">
+          Student names must be whitespace separated (newline, space or tab). If a student has more than one name, combine them into one without whitespace.
+        </p>
+        <textarea
+          name="students"
+          class="form-control"
+          id="students"
+          aria-describedby="add_students_help"
+          rows="14"
+        ></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-success">Edit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{% endblock %}
