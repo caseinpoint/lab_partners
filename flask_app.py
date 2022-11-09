@@ -166,6 +166,13 @@ def edit_cohort(slug):
     return redirect(f'/cohorts/{new_slug}')
 
 
+@app.route('/about')
+def about():
+    """View README page."""
+
+    return render_template('README.html')
+
+
 def sort_2d_array(arr):
     """Sort each row, then sort by first colum."""
 
