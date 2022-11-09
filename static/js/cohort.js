@@ -96,13 +96,18 @@ const handleFormGenerate = (evt) => {
         const resultsUL = document.querySelector('#pair_results');
         resultsUL.innerHTML = '';
 
-        for (let pair of data.pairs) {
-            pairString = pair.join(' & ');
+        if (!data.success) {
             resultsUL.insertAdjacentHTML('beforeend',
-                                         `<li>${pairString}</li>`);
-        }
+                                         `<li>error: ${data.error}</li>`);
+        } else {
+            for (let pair of data.pairs) {
+                pairString = pair.join(' & ');
+                resultsUL.insertAdjacentHTML('beforeend',
+                                             `<li>${pairString}</li>`);
+            }
 
-        updateCounts(data.new_counts);
+            updateCounts(data.new_counts);
+        }
     });
 };
 

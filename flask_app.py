@@ -48,14 +48,15 @@ def new_cohort():
         flash(f'{slug} already exists.')
         return redirect(f'/cohorts/{slug}')
 
-    students = request.form.get('students', '').strip().split()
+    students = set(request.form.get('students', '')\
+                   .strip().split())
 
     if len(students) < 4:
         flash('At least 4 students are required.')
         return redirect('/new')
 
     with open(f'./data/json/{slug}.json', 'w') as f:
-        dump(students, f)
+        dump(sorted(students), f)
 
     cohort = Cohort(slug)
     cohort.save()
@@ -114,7 +115,7 @@ def update_cohort(slug, new_slug, to_remove, to_add):
         cohort.remove_student(student)
         orig_json.remove(student)
 
-    for student in to_add:
+    for student in set(to_add):
         cohort.add_student(student)
         orig_json.append(student)
 
@@ -184,9 +185,15 @@ def generate_pairs():
         return {'success': False, 'error': 'Cohort not found.'}
 
     cohort = Cohort.load(slug)
+
     absent = set(request.json.get('absent', []))
+    if len(absent) >= len(cohort.roster) - 1:
+        return {'success': False,
+                'error': 'Too many absent students.'}
+
     pairs = cohort.generate_pairs(absent)
     cohort.save()
+
     sort_2d_array(pairs)
     new_counts = cohort.get_count_matrix()
 
