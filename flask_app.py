@@ -164,6 +164,16 @@ def edit_cohort(slug):
 
     return redirect(f'/cohorts/{new_slug}')
 
+
+def sort_2d_array(arr):
+    """Sort each row, then sort by first colum."""
+
+    for row in arr:
+        row.sort()
+
+    arr.sort()
+
+
 @app.route('/api/generate', methods=['POST'])
 def generate_pairs():
     """Generate cohort pairs and return JSON."""
@@ -177,7 +187,7 @@ def generate_pairs():
     absent = set(request.json.get('absent', []))
     pairs = cohort.generate_pairs(absent)
     cohort.save()
-
+    sort_2d_array(pairs)
     new_counts = cohort.get_count_matrix()
 
     return {'success': True,
