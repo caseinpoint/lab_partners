@@ -209,6 +209,34 @@ def generate_pairs():
             'new_counts': new_counts}
 
 
+@app.route('/api/update-count', methods=['POST'])
+def update_count():
+    """Update counts for a pair of students and return JSON."""
+
+    slug = request.json.get('slug')
+
+    if slug is None or not exists(f'./data/pickle/{slug}.pickle'):
+        return {'success': False, 'error': 'Cohort not found.'}
+
+    student1 = request.json.get('student1')
+    student2 = request.json.get('student2')
+    count = request.json.get('count')
+
+    if student1 is None or student2 is None or count is None:
+        return {'success': False, 'error': 'Input error.'}
+
+    cohort = Cohort.load(slug)
+
+    count = int(count)
+    old_count = cohort.roster[student1][student2]
+    diff = count - old_count
+    cohort.update_roster(students=(student1, student2), incr=diff)
+    cohort.save()
+
+    return {'success': True,
+            'new_counts': cohort.get_count_matrix()}
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run()

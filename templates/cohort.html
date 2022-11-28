@@ -101,7 +101,7 @@
 <div class="row">
   <div class="col table-responsive">
     <h3>Student counts:</h3>
-    <table class="table table-sm table-bordered">
+    <table class="table table-sm table-bordered" id="counts_table">
       <thead>
         <tr>
           <th scope="col" id="cell-0-0"></th>
@@ -110,9 +110,8 @@
               scope="col"
               id="cell-0-{{h}}"
               class="text-center"
-            >
-              {{counts[0][h]}}
-            </th>
+              data-student="{{counts[0][h]}}"
+            >{{counts[0][h]}}</th>
           {% endfor %}
         </tr>
       </thead>
@@ -124,25 +123,31 @@
               scope="row"
               id="cell-{{r}}-0"
               class="text-end"
-            >
-              {{counts[r][0]}}
-            </th>
+              data-student="{{counts[r][0]}}"
+            >{{counts[r][0]}}</th>
             {% for c in range(1, counts[r]|length) %}
               {% if counts[r][c] is not none %}
                 <td
                   id="cell-{{r}}-{{c}}"
                   class="text-center cell_count"
-                >
-                  {{counts[r][c]}}
-                </td>
+                  data-highlight="false"
+                  data-count="{{counts[r][c]}}"
+                >{{counts[r][c]}}</td>
               {% else %}
-                <td id="cell-{{r}}-{{c}}" class="text-center cell_count">-</td>
+                <td
+                  id="cell-{{r}}-{{c}}"
+                  class="text-center cell_count"
+                  data-count="-"
+                >-</td>
               {% endif %}
             {% endfor %}
           </tr>
         {% endfor %}
       </tbody>
     </table>
+
+    <label for="counts_table">Double click a cell to manually edit the count.
+      Press Enter to submit, or Escape to cancel.</label>
   </div>
 </div>
 {% endblock %}
