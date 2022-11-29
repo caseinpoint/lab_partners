@@ -150,7 +150,7 @@ def edit_cohort(slug):
     if len(new_slug) < 1:
         flash('Cohort slug is required')
         return redirect(f'/cohorts/{slug}/edit')
-    if new_slug in get_cohort_slugs():
+    if slug != new_slug and new_slug in get_cohort_slugs():
         flash(f'{new_slug} already exists.')
         return redirect(f'/cohorts/{slug}/edit')
 
