@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Lab Pairs | {{slug}}{% endblock %}
+
+{% block nav %}
+<li class="nav-item">
+  <a class="nav-link" href="/cohorts/{{slug}}">{{slug}}</a>
+</li>
+{% endblock %}
+
+{%block container %}
+<div class="row">
+  <div class="col-3">
+    <h1>Cohort: {{slug}}</h1>
+  </div>
+
+  <div class="col pt-2">
+    <div class="btn-group" role="group">
+      <button
+        class="btn btn-primary"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#pairs_offcanvas"
+      >
+        Generate Pairs
+      </button>
+      <a
+      class="btn btn-outline-success"
+      href="/cohorts/{{slug}}/edit"
+    >
+      Edit Cohort
+    </a>
+    <a
+      class="btn btn-outline-danger btn_delete"
+      href="/cohorts/{{slug}}/delete"
+    >
+      Delete Cohort
+    </a>
+    </div>
+  </div>
+</div>
+
+<div
+  class="offcanvas offcanvas-start bg-light"
+  id="pairs_offcanvas"
+  data-bs-scroll="true"
+  data-bs-backdrop="false"
+  tabindex="-1"
+>
+  <div class="offcanvas-header">
+    <h3 class="offcanvas-title">New Pairs</h3>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <form id="form_generate">
+      <h5>Select any absent students:</h5>
+
+      <input type="hidden" name="slug" id="slug" value="{{slug}}">
+
+      <div class="mb-2">
+        {% for r in range(1, counts|length) %}
+          <input
+            type="checkbox"
+            class="btn-check absent"
+            name="absent"
+            value="{{counts[r][0]}}"
+            id="check-{{counts[r][0]}}"
+            autocomplete="off"
+          >
+          <label
+            for="check-{{counts[r][0]}}"
+            class="btn btn-outline-secondary mb-1"
+          >
+            {{counts[r][0]}}
+          </label>
+        {% endfor %}
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+      >
+        <strong>Generate Pairs</strong>
+      </button>
+    </form>
+
+    <hr>
+    <div>
+      <h5>Results:</h5>
+      <ul id="pair_results"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col table-responsive">
+    <h3>Student counts:</h3>
+    <table class="table table-sm table-bordered" id="counts_table">
+      <thead>
+        <tr>
+          <th scope="col" id="cell-0-0"></th>
+          {% for h in range(1, counts[0]|length) %}
+            <th
+              scope="col"
+              id="cell-0-{{h}}"
+              class="text-center"
+              data-student="{{counts[0][h]}}"
+            >{{counts[0][h]}}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for r in range(1, counts|length) %}
+          <tr>
+            <th
+              scope="row"
+              id="cell-{{r}}-0"
+              class="text-end"
+              data-student="{{counts[r][0]}}"
+            >{{counts[r][0]}}</th>
+            {% for c in range(1, counts[r]|length) %}
+              {% if counts[r][c] is not none %}
+                <td
+                  id="cell-{{r}}-{{c}}"
+                  class="text-center cell_count"
+                  data-highlight="false"
+                  data-count="{{counts[r][c]}}"
+                >{{counts[r][c]}}</td>
+              {% else %}
+                <td
+                  id="cell-{{r}}-{{c}}"
+                  class="text-center cell_count"
+                  data-count="-"
+                >-</td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <label for="counts_table">Double click a cell to manually edit the count.
+      Press Enter to submit, or Escape to cancel.</label>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/js/deleteBtn.js"></script>
+<script src="/static/js/cohort.js"></script>
+{% endblock %}

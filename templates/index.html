@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Lab Pairs | Index{% endblock %}
+
+{%block container %}
+<h1>Cohorts</h1>
+
+<div class="row">
+  <div class="col-12 col-md-9 col-lg-6">
+    <table class="table table-hover">
+      <thead>
+        <tr class="table-light">
+          <th scope="col">Cohort Slug</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for cohort in cohorts %}
+        <tr>
+          <td>
+            <a href="/cohorts/{{cohort}}">{{cohort}}</a>
+          </td>
+
+          <td>
+            <div class="btn-group btn-group-sm" role="group">
+              <a
+                class="btn btn-outline-primary"
+                href="/cohorts/{{cohort}}"
+              >
+                View
+              </a>
+              <a
+                class="btn btn-outline-success"
+                href="/cohorts/{{cohort}}/edit"
+              >
+                Edit
+              </a>
+              <a
+                class="btn btn-outline-danger btn_delete"
+                href="/cohorts/{{cohort}}/delete"
+              >
+                Delete
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <p>Please delete your cohort after graduation to save space.</p>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="/static/js/deleteBtn.js"></script>
+{% endblock %}

@@ -210,6 +210,28 @@ class Cohort:
 
         return groups
 
+    def get_count_matrix(self):
+        """Return a 2D list of names and counts."""
+
+        students = sorted(self.roster.keys())
+        partners = students[::-1]
+
+        matrix = []
+        matrix.append([None] + partners)
+
+        for student in students:
+            row = [student]
+
+            for partner in partners:
+                if student == partner:
+                    row.append(None)
+                else:
+                    row.append(self.roster[student][partner])
+
+            matrix.append(row)
+
+        return matrix
+
 
 def print_sorted(groups: list, separator: str = ' & ') -> None:
     """Sort 2D list and pprint rows."""
@@ -226,7 +248,7 @@ def print_csv(cohort: 'Cohort') -> None:
     """Print Cohort in .csv format."""
 
     students = sorted(cohort.roster.keys())
-    partners = sorted(cohort.roster.keys(), reverse=True)
+    partners = students[::-1]
 
     print(',', end='')
     for partner in partners:
