@@ -7,3 +7,9 @@
 ## The Solution
 
 ## The Application
+
+For the CLI tool, check out the
+[:twisted_rightwards_arrows: cli branch](https://github.com/caseinpoint/lab_partners/tree/cli)
+
+For the web app, check out the
+[:twisted_rightwards_arrows: webapp branch](https://github.com/caseinpoint/lab_partners/tree/webapp)
