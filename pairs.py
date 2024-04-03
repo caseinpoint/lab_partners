@@ -375,6 +375,16 @@ def main(args: argparse.Namespace):
 
     print(args)
 
+    json_path = f'./data/json/{args.cohort}.json'
+    if not exists(json_path):
+        raise FileNotFoundError(f'"{json_path}" does not exist for cohort "{args.cohort}"')
+
+    # load existing cohort if exists, else create a new one
+    if exists(f'./data/pickle/{args.cohort}.pickle'):
+        cohort = Cohort.load(args.cohort)
+    else:
+        cohort = Cohort(args.cohort)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
