@@ -355,8 +355,8 @@ def print_csv(cohort: "Cohort") -> None:
 #     # generate many groups w/out saving for testing purposes
 #     elif flag == '--test':
 #         for i in range(len(cohort.roster) + 1):
-#             print(i)
 #             absent = set(names)
+#             print(i)
 #             pairs = cohort.generate_pairs(absent)
 #             print_sorted(pairs, separator=',')
 
@@ -375,15 +375,54 @@ def main(args: argparse.Namespace):
 
     print(args)
 
-    json_path = f'./data/json/{args.cohort}.json'
+    # a JSON file with array of names is required
+    json_path = f"./data/json/{args.cohort}.json"
     if not exists(json_path):
-        raise FileNotFoundError(f'"{json_path}" does not exist for cohort "{args.cohort}"')
+        hint = (
+            '\n\tHint: do not include ".json" in cohort name.'
+            if args.cohort.lower().endswith(".json")
+            else ""
+        )
+        raise FileNotFoundError(
+            f'"{json_path}" does not exist for cohort "{args.cohort}"{hint}'
+        )
 
     # load existing cohort if exists, else create a new one
-    if exists(f'./data/pickle/{args.cohort}.pickle'):
+    if exists(f"./data/pickle/{args.cohort}.pickle"):
         cohort = Cohort.load(args.cohort)
     else:
         cohort = Cohort(args.cohort)
+
+    # handle optional arguments
+    if args.generate:
+        # create set of absent students, if any
+        if args.absent is not None:
+            absent = set(args.absent.split(","))
+        else:
+            absent = set()
+
+        pairs = cohort.generate_pairs(unavailable=absent)
+        cohort.save()
+
+        print_sorted(groups=pairs)
+
+    elif args.counts:
+        print_csv(cohort=cohort)
+
+    elif args.test:
+        # generate several groups of pairs and print, but do not save
+
+        for i in range(len(cohort.roster) + 1):
+            # create new set of absent students each iteration, if any
+            if args.absent is not None:
+                absent = set(args.absent.split(","))
+            else:
+                absent = set()
+
+            pairs = cohort.generate_pairs(unavailable=absent)
+
+            print(i)
+            print_sorted(groups=pairs, separator=",")
 
 
 if __name__ == "__main__":
@@ -400,6 +439,7 @@ if __name__ == "__main__":
         "-a", "--absent", help="Absent students. Separate names with commas."
     )
 
+    # options must be one of the following
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "-g", "--generate", help="Generate lab pairs.", action="store_true"
@@ -407,7 +447,7 @@ if __name__ == "__main__":
     group.add_argument(
         "-c",
         "--counts",
-        help="Show current counts for all students.",
+        help="Show current counts for all students in CSV notation.",
         action="store_true",
     )
     group.add_argument(
