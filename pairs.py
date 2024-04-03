@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import argparse
 from collections import Counter
+from json import dump as js_dump
 from json import load as js_load
 from pickle import load as pk_load
 from pickle import dump as pk_dump
@@ -24,9 +26,9 @@ class Cohort:
         """Load a list of students from JSON and set the instance roster.
 
         Roster will be a dictionary with a collections.Counter for each student
-        to track how many times they've been paired with every other student"""
+        to track how many times they've been paired with every other student."""
 
-        with open(f'./data/json/{self.name}.json', 'r') as f:
+        with open(f"./data/json/{self.name}.json", "r") as f:
             names = js_load(f)
 
         self.roster = {}
@@ -36,14 +38,14 @@ class Cohort:
     def save(self) -> None:
         """Cache the student roster."""
 
-        with open(f'./data/pickle/{self.name}.pickle', 'wb') as f:
+        with open(f"./data/pickle/{self.name}.pickle", "wb") as f:
             pk_dump(obj=self.roster, file=f)
 
     @classmethod
-    def load(cls, name: str) -> 'Cohort':
+    def load(cls, name: str) -> "Cohort":
         """Load a cached roster and return a new Cohort instance."""
 
-        with open(f'./data/pickle/{name}.pickle', 'rb') as f:
+        with open(f"./data/pickle/{name}.pickle", "rb") as f:
             roster = pk_load(f)
 
         return cls(name, roster)
@@ -103,7 +105,7 @@ class Cohort:
 
         If multiple results, return the first encountered."""
 
-        lowest_sum = float('inf')
+        lowest_sum = float("inf")
         result = None
 
         names_counts = sorted(self.roster.items())
@@ -146,8 +148,7 @@ class Cohort:
         count."""
 
         pair = [first_student]
-        students = Cohort._shuffle_common(
-            self.roster[first_student].most_common())
+        students = Cohort._shuffle_common(self.roster[first_student].most_common())
 
         for student in students:
             if student in unavailable:
@@ -211,7 +212,7 @@ class Cohort:
         return groups
 
 
-def print_sorted(groups: list, separator: str = ' & ') -> None:
+def print_sorted(groups: list, separator: str = " & ") -> None:
     """Sort 2D list and pprint rows."""
 
     for group in groups:
@@ -222,24 +223,24 @@ def print_sorted(groups: list, separator: str = ' & ') -> None:
         print(separator.join(group))
 
 
-def print_csv(cohort: 'Cohort') -> None:
+def print_csv(cohort: "Cohort") -> None:
     """Print Cohort in .csv format."""
 
     students = sorted(cohort.roster.keys())
     partners = sorted(cohort.roster.keys(), reverse=True)
 
-    print(',', end='')
+    print(",", end="")
     for partner in partners:
-        print(partner, end=',')
+        print(partner, end=",")
     print()
 
     for student in students:
-        print(student, end=',')
+        print(student, end=",")
         for partner in partners:
             if partner == student:
-                print('-', end=',')
+                print("-", end=",")
             else:
-                print(cohort.roster[student][partner], end=',')
+                print(cohort.roster[student][partner], end=",")
         print()
 
 
@@ -368,6 +369,59 @@ def print_csv(cohort: 'Cohort') -> None:
 #     else:
 #         main(*argv[1:])
 
-if __name__ == '__main__':
-    from argparse import ArgumentParser
-    parser = ArgumentParser()
+
+def main(args: argparse.Namespace):
+    """Run commands based on parsed CLI args."""
+
+    print(args)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Generate students' random lab pairs, and save pair history to reduce future repeats."
+    )
+
+    parser.add_argument(
+        "cohort",
+        help="Name of the cohort. A JSON file with that name must exist in `./data/json`. See `./data/json/example.json`.",
+    )
+
+    parser.add_argument(
+        "-a", "--absent", help="Absent students. Separate names with commas."
+    )
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "-g", "--generate", help="Generate lab pairs.", action="store_true"
+    )
+    group.add_argument(
+        "-c",
+        "--counts",
+        help="Show current counts for all students.",
+        action="store_true",
+    )
+    group.add_argument(
+        "-i",
+        "--increment",
+        help="Increment the counts for a group of students by one. Separate names with commas.",
+    )
+    group.add_argument(
+        "-d",
+        "--decrement",
+        help="Decrement the counts for a group of students by one. Separate names with commas.",
+    )
+    group.add_argument(
+        "-p",
+        "--prevent",
+        help="Prevent the future pairing of students. Separate names with commas.",
+    )
+    group.add_argument("--add", help="Add a student name to the roster.")
+    group.add_argument("--remove", help="Remove a student name to the roster.")
+    group.add_argument(
+        "--test",
+        help="Generate several groups of pairs without saving counts.",
+        action="store_true",
+    )
+
+    args = parser.parse_args()
+    main(args)
