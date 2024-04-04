@@ -373,8 +373,6 @@ def print_csv(cohort: "Cohort") -> None:
 def main(args: argparse.Namespace):
     """Run commands based on parsed CLI args."""
 
-    print(args)
-
     # a JSON file with array of names is required
     json_path = f"./data/json/{args.cohort}.json"
     if not exists(json_path):
@@ -387,7 +385,7 @@ def main(args: argparse.Namespace):
             f'"{json_path}" does not exist for cohort "{args.cohort}"{hint}'
         )
 
-    # load existing cohort if exists, else create a new one
+    # load existing Cohort if exists, else create a new one
     if exists(f"./data/pickle/{args.cohort}.pickle"):
         cohort = Cohort.load(args.cohort)
     else:
@@ -401,6 +399,7 @@ def main(args: argparse.Namespace):
         else:
             absent = set()
 
+        # generate pairs and save counts
         pairs = cohort.generate_pairs(unavailable=absent)
         cohort.save()
 
@@ -409,11 +408,68 @@ def main(args: argparse.Namespace):
     elif args.counts:
         print_csv(cohort=cohort)
 
+    elif args.increment is not None:
+        names = args.increment.split(',')
+        cohort.update_roster(students=names)
+        cohort.save()
+
+        print(f'Pairing counts for {names} incremented by one.')
+
+    elif args.decrement is not None:
+        names = args.decrement.split(',')
+        cohort.update_roster(students=names, incr=-1)
+        cohort.save()
+
+        print(f'Pairing counts for {names} decremented by one.')
+
+    elif args.prevent is not None:
+        names = args.decrement.split(',')
+
+        if len(names) != 2:
+            raise ValueError('Exactly 2 student names must be provided.')
+
+        cohort.prevent_pairing(student_1=names[0], student_2=names[1])
+        cohort.save()
+
+        print(f'Increased the counts for {names} to prevent future pairing.')
+
+    elif args.add is not None:
+        if args.add in cohort.roster:
+            raise KeyError(f'{args.add} already in cohort.')
+
+        cohort.add_student(new_student=args.add)
+        cohort.save()
+
+        # update JSON file
+        with open(json_path) as json_read:
+            json_lst = js_load(json_read)
+        json_lst.append(args.add)
+        with open(json_path, 'w') as json_write:
+            js_dump(obj=json_lst, fp=json_write, indent=4)
+
+        print(f'{args.add} added to cohort "{args.cohort}".')
+
+    elif args.remove is not None:
+        if args.remove not in cohort.roster:
+            raise KeyError(f'{args.remove} not in cohort.')
+
+        cohort.remove_student(student=args.remove)
+        cohort.save()
+
+        # update JSON file
+        with open(json_path) as json_read:
+            json_lst = js_load(json_read)
+        json_lst.remove(args.remove)
+        with open(json_path, 'w') as json_write:
+            js_dump(obj=json_lst, fp=json_write, indent=4)
+
+        print(f'{args.remove} removed from cohort "{args.cohort}".')
+
     elif args.test:
         # generate several groups of pairs and print, but do not save
 
         for i in range(len(cohort.roster) + 1):
-            # create new set of absent students each iteration, if any
+            # create new set of absent students each iteration (passed by ref)
             if args.absent is not None:
                 absent = set(args.absent.split(","))
             else:
@@ -432,11 +488,11 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "cohort",
-        help="Name of the cohort. A JSON file with that name must exist in `./data/json`. See `./data/json/example.json`.",
+        help="Name of the cohort. A JSON file with that name, containing an array of student names, must exist in `./data/json`. See `./data/json/example.json`.",
     )
 
     parser.add_argument(
-        "-a", "--absent", help="Absent students. Separate names with commas."
+        "-a", "--absent", help="Absent students to exclude from generated pairs. Separate names with commas."
     )
 
     # options must be one of the following
@@ -463,10 +519,10 @@ if __name__ == "__main__":
     group.add_argument(
         "-p",
         "--prevent",
-        help="Prevent the future pairing of students. Separate names with commas.",
+        help="Prevent the future pairing of 2 students. Separate names with a comma.",
     )
     group.add_argument("--add", help="Add a student name to the roster.")
-    group.add_argument("--remove", help="Remove a student name to the roster.")
+    group.add_argument("--remove", help="Remove a student name from the roster.")
     group.add_argument(
         "--test",
         help="Generate several groups of pairs without saving counts.",
