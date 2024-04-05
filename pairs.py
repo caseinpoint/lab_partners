@@ -317,7 +317,10 @@ def main(args: argparse.Namespace):
         # update JSON file
         with open(json_path) as json_read:
             json_lst = js_load(json_read)
+
         json_lst.append(args.add)
+        json_lst.sort()
+
         with open(json_path, 'w') as json_write:
             js_dump(obj=json_lst, fp=json_write, indent=4)
 

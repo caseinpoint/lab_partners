@@ -126,7 +126,7 @@ Elizabeth & EmilyA
 Evelyn & Mia
 ```
 
-To generate pairs when Ava and Mia are absent:
+To generate pairs when Ava and Mia are absent, as an example:
 ```
 ./pair example -g -a Ava,Mia
 ```
