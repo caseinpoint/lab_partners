@@ -90,8 +90,52 @@ to tell them apart. Duplicates will get overridden. See the included
 
 This tool has been built with the
 [argparse](https://docs.python.org/3.10/library/argparse.html) module. To see
-usage and options run
+usage and options run:
 ```
 ./pair --help
 ```
-or `./pair -h`.
+<sup>or `./pair -h`.</sup>
+
+The first argument, cohort name, is required. This must match the name of the
+JSON file in `./data/json` (without the .json extension).
+
+The second argument is also required, and must be one of the following:
+- `-g` or `--generate` to generate pairs
+- `-c` or `--counts` to see all the past pairing counts in CSV format
+- `-i` or `--increment` to manually increment the counts for a pair by one
+- `-d` or `--decrement` to manually decrement the counts for a pair by one
+- `-p` or `--prevent` to prevent the future pairing of two students
+- `--add` to add a student to the roster
+- `--remove` to remove a student from the roster
+
+A third argument, `-a` or `--absent`, is optional, and allows you to include a
+list of absent students so they won't be included in the pairs generated.
+
+For the example cohort, this is how you would generate pairs:
+```
+./pair example -g
+```
+
+And the output should look like this:
+```
+Abigail & EmilyD
+Amelia & Isabella & Sophia
+Ava & Madison
+Charlotte & Olivia
+Elizabeth & EmilyA
+Evelyn & Mia
+```
+
+To generate pairs when Ava and Mia are absent:
+```
+./pair example -g -a Ava,Mia
+```
+
+And the output would look something like this:
+```
+Abigail & Sophia
+Amelia & Charlotte
+Elizabeth & Evelyn & Isabella
+EmilyA & Olivia
+EmilyD & Madison
+```
