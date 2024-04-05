@@ -57,7 +57,7 @@ this tool may still be in use by others, so only mess around with the
 
 You will need `git` and `Python 3` installed.
 
-1. Clone this branch to your local machine:
+__1. Clone this branch to your local machine:__
 
 HTTPS:
 ```
@@ -69,8 +69,25 @@ SSH:
 git clone --single-branch --branch cli git@github.com:caseinpoint/lab_partners.git
 ```
 
-2. For ease of use, make the symlink file `pair` executable:
+__2. For ease of use, make the symlink file `pair` executable:__
 
 ```
 chmod +x pair
 ```
+This will allow you to run `./pair` in the terminal, instead of
+`python3 pairs.py`.
+
+### Setup
+
+This tool requires a JSON file for each class/cohort with an array of names to
+be saved in `./data/json`. To make the names parsable in the command line, make
+sure that they don't include any spaces or special characters. If you have more
+than one student with the same name, make sure to include initials or nicknames
+to tell them apart. Duplicates will get overridden. See the included
+[example.json](./data/json/example.json).
+
+### Usage
+
+This tool has been built with the
+[argparse](https://docs.python.org/3.10/library/argparse.html) module. To see
+usage and options run `./pair --help` or `./pair -h`.
