@@ -93,4 +93,5 @@ This tool has been built with the
 usage and options run
 ```
 ./pair --help
-``` or `./pair -h`.
+```
+or `./pair -h`.
