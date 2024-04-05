@@ -43,3 +43,8 @@ For the CLI tool, check out the
 
 For the web app, check out the
 [:twisted_rightwards_arrows: webapp branch](https://github.com/caseinpoint/lab_partners/tree/webapp)
+
+You can see the web app deployed on pythonanywhere
+[here](http://caseinpoint.pythonanywhere.com/). Please note that this tool may
+still be in use by others, so only mess around with the
+[example cohort](http://caseinpoint.pythonanywhere.com/cohorts/example).
