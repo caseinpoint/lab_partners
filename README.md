@@ -30,8 +30,9 @@ been absent the most). Then, a partner for the first student is found by the
 normal, weighted method. Finally, a third student is found based on the lowest
 sum of past pairings for the whole group of three.
 
-4. An instance of the `Cohort` class is created for each cohort/class, which
-has methods for generating pairs as well as persisting the data via `pickle`
+4. An instance of the custom `Cohort` class is created for each cohort/class,
+which has methods for generating pairs as well as persisting the data via
+`pickle`.
 
 ## The Application
 
@@ -45,6 +46,7 @@ For the web app, check out the
 [:twisted_rightwards_arrows: webapp branch](https://github.com/caseinpoint/lab_partners/tree/webapp)
 
 You can see the web app deployed on pythonanywhere
-[here](http://caseinpoint.pythonanywhere.com/). Please note that this tool may
-still be in use by others, so only mess around with the
-[example cohort](http://caseinpoint.pythonanywhere.com/cohorts/example).
+[here](http://caseinpoint.pythonanywhere.com/). :bangbang: Please note that
+this tool may still be in use by others, so only mess around with the
+[example cohort](http://caseinpoint.pythonanywhere.com/cohorts/example), or
+[create a new one](http://caseinpoint.pythonanywhere.com/new). Thanks!
