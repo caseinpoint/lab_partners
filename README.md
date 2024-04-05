@@ -78,11 +78,14 @@ Creating a new cohort.
 
 ![Viewing cohort details](./static/img/webapp2.png)
 
-Viewing cohort details and counts of past pairings.
+Viewing cohort details and counts of past pairings. This page has several JS
+files for improving user interaction, and sending data to the server
+asynchronously.
 
 ![Generating new pairs](./static/img/webapp3.png)
 
-Generating new pairs on the cohort details page.
+Generating new pairs on the cohort details page. This is handled with async JS
+and server side Python functions.
 
 ![Editing a cohort](./static/img/webapp4.png)
 
