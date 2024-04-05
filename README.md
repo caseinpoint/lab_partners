@@ -23,7 +23,7 @@ selection process.
 2. A set of unavailable students is added to as the pairs are being generated,
 so absent students can be added to the set before selection even begins.
 
-3. The group of three is selected first. First, the student with with smallest
+3. The group of three is chosen first. First, the student with with smallest
 sum of total past pairings is selected. This student is likely to be the one
 who has been in the fewest groups of three so far (though they could also have
 been absent the most). Then, a partner for the first student is found by the
@@ -53,4 +53,41 @@ this tool may still be in use by others, so only mess around with the
 
 ## Web App
 
-:construction: This part of the README is a work in progress.
+### Technologies
+
+- Python3
+- [Flask](https://flask.palletsprojects.com/en/2.2.x/) web server framework
+- [Jinja2](https://jinja.palletsprojects.com/en/3.1.x/) templating engine
+- JavaScript
+- [Bootstrap](https://getbootstrap.com/docs/5.2/getting-started/introduction/)
+CSS and JS library
+- Deployed on [pythonanywhere](https://www.pythonanywhere.com/) (see above)
+
+### Description
+
+![screenshot of home page](./static/img/webapp0.png)
+
+Built upon the original CLI tool, users of the web app have access to all
+functionality in a simple, easy to use UI.
+
+From the home page, users can directly access most features:
+
+![Create a new cohort](./static/img/webapp1.png)
+
+Creating a new cohort.
+
+![Viewing cohort details](./static/img/webapp2.png)
+
+Viewing cohort details and counts of past pairings.
+
+![Generating new pairs](./static/img/webapp3.png)
+
+Generating new pairs on the cohort details page.
+
+![Editing a cohort](./static/img/webapp4.png)
+
+Editing a cohort.
+
+![Deleting a cohort](./static/img/webapp5.png)
+
+Deleting a cohort.
