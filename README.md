@@ -90,4 +90,7 @@ to tell them apart. Duplicates will get overridden. See the included
 
 This tool has been built with the
 [argparse](https://docs.python.org/3.10/library/argparse.html) module. To see
-usage and options run `./pair --help` or `./pair -h`.
+usage and options run
+```
+./pair --help
+``` or `./pair -h`.
