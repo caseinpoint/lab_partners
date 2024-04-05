@@ -94,7 +94,7 @@ usage and options run:
 ```
 ./pair --help
 ```
-<sup>or `./pair -h`.</sup>
+(or `./pair -h`.)
 
 The first argument, cohort name, is required. This must match the name of the
 JSON file in `./data/json` (without the .json extension).
