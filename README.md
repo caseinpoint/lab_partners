@@ -50,3 +50,27 @@ You can see the web app deployed on pythonanywhere
 this tool may still be in use by others, so only mess around with the
 [example cohort](http://caseinpoint.pythonanywhere.com/cohorts/example), or
 [create a new one](http://caseinpoint.pythonanywhere.com/new). Thanks!
+
+## CLI Tool
+
+### Installation
+
+You will need `git` and `Python 3` installed.
+
+1. Clone this branch to your local machine:
+
+HTTPS:
+```
+git clone --single-branch --branch cli https://github.com/caseinpoint/lab_partners.git
+```
+
+SSH:
+```
+git clone --single-branch --branch cli git@github.com:caseinpoint/lab_partners.git
+```
+
+2. For ease of use, make the symlink file `pair` executable:
+
+```
+chmod +x pair
+```
